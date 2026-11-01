@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Trading Office Web</title>
 <meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Trading Office">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="config.js" onerror="window.TO_CONFIG=window.TO_CONFIG||null"></script>
@@ -277,11 +284,21 @@ function lab(el, stale) { el.innerHTML = head('Laboratorij', 'Dnevnik laboratori
 function kos(el, stale) {
   el.innerHTML = head('Koš', 'Izbrisani agenti — vrneš jih v aplikaciji (30 dni)') + stale + `<div class="card"><div class="tw"><table><thead><tr><th>Agent</th><th>Vrsta</th><th class="n">Tradi</th><th class="n">R</th><th>Izbrisan</th></tr></thead><tbody>${LIVE.trash.slice().reverse().map(t => `<tr><td>${esc(t.name)}</td><td><span class="b">${t.kind === 'special' ? 'Posebni' : 'Navadni'}</span></td><td class="n">${t.n}</td><td class="n ${pn(t.r)}">${fR(t.r)}</td><td class="muted">${dt(t.at)}</td></tr>`).join('') || '<tr><td colspan="5"><div class="empty"><b>Koš je prazen</b></div></td></tr>'}</tbody></table></div></div>`;
 }
+const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 function dlP(el) {
   const C = window.TO_CONFIG || {}, repo = C.repo, v = C.version || '', base = repo ? `https://github.com/${repo}/releases/latest/download/` : '';
   const item = (t, d, f) => `<div class="ai" style="border-right:0;cursor:default"><div class="nm"><b>${t}</b><small>${d}</small></div>${repo ? `<a class="btn pri" href="${base + f}">${ic('down')}Prenesi</a>` : '<span class="muted">povezava še ni nastavljena</span>'}</div>`;
   el.innerHTML = head('Prenesi aplikacijo', `Zadnja verzija${v ? ' <b>' + esc(v) + '</b>' : ''} — vsaka posodobitev se objavi samodejno`) + `<div class="card">${item('Trading Office Pro', 'Windows · prijava, črno-bel videz, tabele, lučke · priporočeno', 'Trading-Office-Pro-Setup.exe')}${item('Trading Office', 'Windows · klasičen videz s pixel pisarno', 'Trading-Office-Setup.exe')}</div>
+    <div class="card"><div class="ch"><h3>Telefon (iPhone in Android)</h3>${isStandalone() ? '<span class="b g">nameščeno</span>' : ''}</div><div class="cb">
+      <p class="muted" style="margin-top:0">Trading Office Web namestiš na telefon kot aplikacijo: ikona na začetnem zaslonu, odpre se čez cel zaslon brez brskalnika, ostaneš prijavljen.</p>
+      ${instEvt ? `<button class="btn pri" id="inst">${ic('down')}Namesti na ta telefon</button>` : ''}
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:12px">
+        <div style="border:1px solid var(--line);border-radius:8px;padding:14px${isIOS() ? ';border-color:var(--text)' : ''}"><b>iPhone / iPad (Safari)</b><ol style="margin:8px 0 0 18px;padding:0;line-height:1.9;color:var(--muted)"><li>Odpri to stran v <b>Safariju</b></li><li>Tapni gumb <b>Deli</b> (kvadrat s puščico ⬆) spodaj</li><li>Izberi <b>»Dodaj na začetni zaslon«</b></li><li>Tapni <b>Dodaj</b> — ikona TO se pojavi na zaslonu</li></ol></div>
+        <div style="border:1px solid var(--line);border-radius:8px;padding:14px${!isIOS() && /Android/i.test(navigator.userAgent) ? ';border-color:var(--text)' : ''}"><b>Android (Chrome)</b><ol style="margin:8px 0 0 18px;padding:0;line-height:1.9;color:var(--muted)"><li>Odpri to stran v <b>Chromu</b></li><li>Tapni meni <b>⋮</b> zgoraj desno</li><li>Izberi <b>»Namesti aplikacijo«</b> ali »Dodaj na začetni zaslon«</li></ol></div></div>
+      <p class="muted" style="font-size:12.5px;margin-bottom:0">Naslov za telefon: <b>${esc(location.origin + location.pathname)}</b></p></div></div>
     <div class="card"><div class="cb"><b>Namestitev na nov računalnik</b><ol style="margin:8px 0 0 18px;padding:0;line-height:1.8;color:var(--muted)"><li>Prenesi in zaženi installer (Windows lahko opozori na neznanega izdajatelja → »Več informacij« → »Vseeno zaženi«).</li><li>V aplikaciji odpri <b>Nastavitve → Trading Office Web</b> in se prijavi s tem računom.</li><li>Klikni <b>»Prenesi podatke iz oblaka«</b> — dobiš vse agente in znanje.</li></ol>${repo ? `<p style="margin-top:12px"><a href="https://github.com/${repo}/releases" target="_blank" style="color:var(--muted)">Vse verzije in opombe</a></p>` : ''}</div></div>`;
+  if ($('inst')) $('inst').onclick = async () => { instEvt.prompt(); await instEvt.userChoice; instEvt = null; render(); };
 }
 function setP(el) {
   el.innerHTML = head('Nastavitve', '') + `<div class="card"><div class="cb"><p><b>Prijavljen:</b> ${esc((SES && SES.email) || '')}</p><p><b>Projekt:</b> <span class="muted">${esc(CFG.url)}</span></p><p class="muted">Podatki: ${LIVE ? dt(LIVE.at) : '—'}${LIVE && LIVE.ver ? ' · aplikacija ' + esc(LIVE.ver) : ''}</p>
@@ -295,6 +312,8 @@ function setP(el) {
 (() => { const h = new URLSearchParams(location.hash.slice(1)); if (h.get('access_token') && h.get('refresh_token')) { SES = { tok: h.get('access_token'), ref: h.get('refresh_token'), exp: Date.now() + (+h.get('expires_in') || 3600) * 1000 - 60e3, email: '' }; LS.set('toWebSes', SES); history.replaceState(null, '', location.pathname); page = 'dash'; setTimeout(() => toast('E-pošta potrjena — dobrodošel'), 300); }
   else if (h.get('error_description')) setTimeout(() => { $('l-err').textContent = 'Povezava ni veljavna ali je potekla — prijavi se ali ustvari račun znova'; }, 100); })();
 if (CFG && SES && SES.ref) enter(); else showLogin();
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+let instEvt = null; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); instEvt = e; });
 })();
 </script>
 </body>
