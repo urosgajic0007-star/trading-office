@@ -171,7 +171,7 @@ function showLogin() { $('app').classList.add('hidden'); $('login').classList.re
 $('cfgf').onsubmit = e => { e.preventDefault(); const url = $('c-url').value.trim(), anon = $('c-anon').value.trim(); if (!/^https?:\/\//.test(url)) return $('c-err').textContent = 'URL se mora začeti s https://'; CFG = { url, anon }; LS.set('toWebCfg', CFG); showLogin(); };
 $('l-reset').onclick = e => { e.preventDefault(); LS.set('toWebCfg', null); CFG = window.TO_CONFIG && window.TO_CONFIG.url ? null : null; showLogin(); };
 let mode = 'login'; // login | signup | code
-function setMode(m) { mode = m; const t = { login: ['Prijava', 'Prijavi se v svojo nadzorno ploščo.', 'Prijava', 'Še nimaš računa? <a href="#" data-m="signup">Ustvari račun</a>'], signup: ['Ustvari račun', 'Na e-pošto dobiš kodo za potrditev.', 'Pošlji kodo', 'Že imaš račun? <a href="#" data-m="login">Prijava</a>'], code: ['Potrdi e-pošto', 'Vpiši kodo, ki smo jo poslali na ' + esc($('l-email').value.trim()) + '.', 'Potrdi in ustvari račun', '<a href="#" data-m="resend">Pošlji kodo znova</a> · <a href="#" data-m="signup">Nazaj</a>'] }[m];
+function setMode(m) { mode = m; const t = { login: ['Prijava', 'Prijavi se v svojo nadzorno ploščo.', 'Prijava', 'Še nimaš računa? <a href="#" data-m="signup">Ustvari račun</a>'], signup: ['Ustvari račun', 'Na e-pošto dobiš kodo za potrditev.', 'Pošlji kodo', 'Že imaš račun? <a href="#" data-m="login">Prijava</a>'], code: ['Potrdi e-pošto', 'Na ' + esc($('l-email').value.trim()) + ' smo poslali mail. Klikni povezavo v njem <b>ali</b> vpiši kodo, če je v mailu.', 'Potrdi in ustvari račun', '<a href="#" data-m="resend">Pošlji kodo znova</a> · <a href="#" data-m="signup">Nazaj</a>'] }[m];
   $('l-h').textContent = t[0]; $('l-p').innerHTML = t[1]; $('l-btn').textContent = t[2]; $('l-sw').innerHTML = t[3]; $('l-err').textContent = '';
   $('l-main').classList.toggle('hidden', m === 'code'); $('l-p2w').classList.toggle('hidden', m !== 'signup'); $('l-codew').classList.toggle('hidden', m !== 'code');
   $('l-pass').autocomplete = m === 'signup' ? 'new-password' : 'current-password'; $('l-pass').required = m !== 'code'; $('l-email').required = m !== 'code'; if (m === 'code') setTimeout(() => $('l-code').focus(), 30); }
@@ -291,6 +291,9 @@ function setP(el) {
   $('dl').onclick = async () => { $('dl').disabled = true; try { const F = await loadFull(); if (!F) return toast('V oblaku še ni celotnih podatkov'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(F.data)], { type: 'application/json' })); a.download = `trading-office-${new Date(F.updated_at).toISOString().slice(0, 10)}.json`; a.click(); } catch (e) { toast(e.message); } finally { $('dl').disabled = false; } };
 }
 
+// povezava iz potrditvenega maila: #access_token=...&refresh_token=...
+(() => { const h = new URLSearchParams(location.hash.slice(1)); if (h.get('access_token') && h.get('refresh_token')) { SES = { tok: h.get('access_token'), ref: h.get('refresh_token'), exp: Date.now() + (+h.get('expires_in') || 3600) * 1000 - 60e3, email: '' }; LS.set('toWebSes', SES); history.replaceState(null, '', location.pathname); page = 'dash'; setTimeout(() => toast('E-pošta potrjena — dobrodošel'), 300); }
+  else if (h.get('error_description')) setTimeout(() => { $('l-err').textContent = 'Povezava ni veljavna ali je potekla — prijavi se ali ustvari račun znova'; }, 100); })();
 if (CFG && SES && SES.ref) enter(); else showLogin();
 })();
 </script>
