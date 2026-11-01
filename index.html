@@ -13,13 +13,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Trading Office">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Oxanium:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="config.js" onerror="window.TO_CONFIG=window.TO_CONFIG||null"></script>
 <style>
-:root { --bg:#f4f4f5; --panel:#fff; --panel2:#fafafa; --panel3:#f1f1f2; --line:#e4e4e7; --line2:#d4d4d8; --text:#09090b; --muted:#71717a; --faint:#a1a1aa; --accent:#09090b; --accent-fg:#fff; --green:#15803d; --red:#b91c1c; --gold:#b45309; --side:#09090b; --rad:8px; --mono:'JetBrains Mono',Consolas,monospace; }
+:root { --bg:#f4f4f5; --panel:#fff; --panel2:#fafafa; --panel3:#f1f1f2; --line:#e4e4e7; --line2:#d4d4d8; --text:#09090b; --muted:#71717a; --faint:#a1a1aa; --accent:#09090b; --accent-fg:#fff; --green:#15803d; --red:#b91c1c; --gold:#b45309; --side:#09090b; --rad:8px; --mono:Oxanium,Consolas,monospace; --disp:Orbitron,Oxanium,sans-serif; }
 :root.dark { --bg:#0a0a0a; --panel:#111; --panel2:#181818; --panel3:#1f1f1f; --line:#262626; --line2:#333; --text:#fafafa; --muted:#a1a1a1; --faint:#6b6b6b; --accent:#fafafa; --accent-fg:#0a0a0a; --green:#22c55e; --red:#ef4444; --gold:#f59e0b; --side:#000; }
 * { box-sizing:border-box; } html,body { margin:0; height:100%; }
-body { font:14px/1.45 Inter,'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); }
+body { font:14px/1.45 Oxanium,'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); }
 .hidden { display:none !important; } .muted { color:var(--muted); } .pos { color:var(--green); } .neg { color:var(--red); } .mono { font-family:var(--mono); letter-spacing:-.02em; }
 button { font:inherit; }
 /* prijava */
@@ -32,7 +32,7 @@ button { font:inherit; }
 .l-right { display:grid; place-items:center; padding:28px; }
 form.lf { width:100%; max-width:360px; } form.lf h1 { font-size:24px; margin:0 0 6px; letter-spacing:-.02em; } form.lf > p { color:var(--muted); margin:0 0 24px; }
 label { display:block; font-size:13px; font-weight:500; margin:0 0 14px; }
-input, select { display:block; width:100%; height:40px; margin-top:6px; padding:0 12px; border:1px solid var(--line2); border-radius:6px; background:var(--panel); color:var(--text); font:14px Inter,sans-serif; outline:none; }
+input, select, button { font-family:inherit; } input, select { display:block; width:100%; height:40px; margin-top:6px; padding:0 12px; border:1px solid var(--line2); border-radius:6px; background:var(--panel); color:var(--text); font:14px Oxanium,sans-serif; outline:none; }
 input:focus { border-color:var(--text); }
 .bp { width:100%; height:40px; border:0; border-radius:6px; background:var(--accent); color:var(--accent-fg); font-weight:600; cursor:pointer; }
 .err { color:var(--red); font-size:13px; min-height:20px; margin-top:10px; }
@@ -113,12 +113,15 @@ td.n, th.n { text-align:right; } td.n { font-family:var(--mono); } td.w { white-
   #app { grid-template-columns:1fr; } #side { position:fixed; left:0; top:0; bottom:0; width:250px; z-index:30; transform:translateX(-100%); transition:transform .2s; } #side.open { transform:none; }
   #menu { display:grid; } #page { padding:16px 14px 40px; } .chip.hm { display:none; } .tools .q { width:100%; }
 }
+.ph h1, .ch h3, .k small, .brand, form.lf h1, #mbox h2 { font-family:var(--disp); text-transform:uppercase; letter-spacing:.07em; } .ch h3 { font-size:12.5px; } .k small { font-size:10.5px; } .ph h1 { font-size:20px; }
+.fx-word { position:relative; display:inline-block; font:800 40px var(--disp); text-transform:uppercase; letter-spacing:.04em; line-height:1; margin:30px 0; }
+.fx-word::before, .fx-word::after { content:attr(data-t); position:absolute; left:0; color:transparent; -webkit-text-stroke:1px currentColor; opacity:.5; } .fx-word::before { top:-.62em; } .fx-word::after { top:.62em; }
 </style>
 </head>
 <body>
 <div id="login">
   <div class="l-left"><div class="brand"><span class="mark">TO</span>Trading Office <span style="color:#737373;font-weight:400">Web</span></div>
-    <div><h2>Tvoji agenti, od kjerkoli.</h2><p>Stanje agentov, odprti tradi, broker boti in Ultron v živo. Računalnik trguje, ti spremljaš s katerekoli naprave.</p></div>
+    <div><div class="fx-word" data-t="Trading Office">Trading Office</div><h2>Tvoji agenti, od kjerkoli.</h2><p>Stanje agentov, odprti tradi, broker boti in Ultron v živo. Računalnik trguje, ti spremljaš s katerekoli naprave.</p></div>
     <div style="color:#525252;font-size:12px">Trading Office Web</div></div>
   <div class="l-right">
     <form class="lf" id="cfgf" class="hidden"><h1>Povezava</h1><p>Prvič na tej napravi — vpiši podatke svojega Supabase projekta.</p>
@@ -235,7 +238,7 @@ function dash(el, stale) {
   const list = A.slice().sort((x, y) => (statusRank[x.st.k] - statusRank[y.st.k]) || (y.r - x.r));
   const feed = [...LIVE.ultron.map(x => ({ t: x.t, w: 'Ultron', x: x.txt })), ...LIVE.lab.map(x => ({ t: x.t, w: 'Laboratorij', x: x.txt })), ...A.flatMap(a => (a.log || []).map(l => ({ t: l.t, w: a.name, x: l.txt })))].sort((a, b) => b.t - a.t).slice(0, 14);
   el.innerHTML = head('Pregled', new Date().toLocaleDateString('sl-SI', { weekday: 'long', day: 'numeric', month: 'long' })) + stale +
-    `<div class="kr">${k('Agenti', A.length, `${A.filter(a => !a.sp).length} navadnih · ${A.filter(a => a.sp).length} posebnih`)}${k('V tradu', inT.length, inT.length ? 'odprto ' + fR(oR) : 'ni odprtih', pn(oR))}${k('Danes', fR(tR), today.length + ' tradov', pn(tR))}${k('Skupaj R', fR(tot), 'vsi zaključeni', pn(tot))}${k('Stanje računov', fE(bal), (bal - st >= 0 ? '+' : '−') + fE(Math.abs(bal - st)) + ' od začetka')}${k('Ultron', esc(({ zadovoljen: 'Zadovoljen', jezen: 'Jezen', zaskrbljen: 'Zaskrbljen' })[M.m] || 'Nadzoruje'), esc(M.why || ''))}</div>
+    `<div class="kr">${k('Agenti', A.length, `${A.filter(a => !a.gen).length} izvirnikov · ${A.filter(a => a.gen).length} klonov`)}${k('V tradu', inT.length, inT.length ? 'odprto ' + fR(oR) : 'ni odprtih', pn(oR))}${k('Danes', fR(tR), today.length + ' tradov', pn(tR))}${k('Skupaj R', fR(tot), 'vsi zaključeni', pn(tot))}${k('Stanje računov', fE(bal), (bal - st >= 0 ? '+' : '−') + fE(Math.abs(bal - st)) + ' od začetka')}${k('Ultron', esc(({ zadovoljen: 'Zadovoljen', jezen: 'Jezen', zaskrbljen: 'Zaskrbljen' })[M.m] || 'Nadzoruje'), esc(M.why || ''))}</div>
     <div class="grid"><div class="card c8"><div class="ch"><h3>Stanje agentov<small>${A.length}</small></h3>${LEG}</div><div class="al">${list.map(agentItem).join('') || '<div class="empty">Ni agentov</div>'}</div></div>
       <div class="card c4"><div class="ch"><h3>Zadnja dejavnost</h3></div><div style="max-height:420px;overflow:auto">${feed.map(f => `<div class="fi"><time>${dt(f.t)}</time><span class="w">${esc(f.w)}</span><span class="t" title="${esc(f.x)}">${esc(f.x)}</span></div>`).join('') || '<div class="empty">—</div>'}</div></div>
       <div class="card c12"><div class="ch"><h3>Broker agenti<small>${LIVE.bots.length}</small></h3></div><div class="al" style="grid-template-columns:repeat(auto-fill,minmax(380px,1fr))">${LIVE.bots.map(botItem).join('') || '<div class="empty">Ni broker botov</div>'}</div></div>
@@ -247,13 +250,13 @@ function openP(el, stale) { el.innerHTML = head('Odprti tradi', 'Pozicije, ki ji
 function botsP(el, stale) { el.innerHTML = head('Broker', 'Pravi računi (TradeLocker, Hyperliquid) — nastavitve botov ostanejo na računalniku') + stale + `<div class="card"><div class="al" style="grid-template-columns:1fr">${LIVE.bots.map(botItem).join('') || '<div class="empty">Ni broker botov</div>'}</div></div>`; }
 
 function agents(el, stale) {
-  const COLS = [['name', 'Ime'], ['sp', 'Vrsta'], ['bal', 'Račun', 'n'], ['r', 'Skupaj R', 'n'], ['n', 'Tradi', 'n'], ['wr', 'Win %', 'n'], ['last', 'Zadnji trade']];
-  let L = LIVE.agents.filter(a => (kindF === 'all' || (kindF === 'sp') === a.sp) && (!q || (a.name + ' ' + a.instr.join(' ')).toLowerCase().includes(q.toLowerCase())));
+  const COLS = [['name', 'Ime'], ['gen', 'Generacija'], ['bal', 'Račun', 'n'], ['r', 'Skupaj R', 'n'], ['n', 'Tradi', 'n'], ['wr', 'Win %', 'n'], ['last', 'Zadnji trade']];
+  let L = LIVE.agents.filter(a => (kindF === 'all' || (kindF === 'g0' ? !a.gen : !!a.gen)) && (!q || (a.name + ' ' + a.instr.join(' ')).toLowerCase().includes(q.toLowerCase())));
   const v = (a, k) => k === 'st' ? statusRank[a.st.k] : k === 'name' ? a.name.toLowerCase() : k === 'r' ? a.r + (a.openR || 0) : k === 'wr' ? (a.wr ?? -1) : a[k] ?? 0;
   L.sort((x, y) => { const a = v(x, sortK), b = v(y, sortK); return (a > b ? 1 : a < b ? -1 : 0) * sortD; });
-  el.innerHTML = head('Agenti', 'Lučka na koncu vrstice kaže trenutno stanje') + stale + `<div class="card"><div class="tools"><select id="kf"><option value="all">Vse vrste</option><option value="ag">Navadni</option><option value="sp">Posebni</option></select><span class="grow"></span><input class="q" id="q" placeholder="Išči po imenu ali instrumentu …" value="${esc(q)}"></div>
+  el.innerHTML = head('Agenti', 'Lučka na koncu vrstice kaže trenutno stanje') + stale + `<div class="card"><div class="tools"><select id="kf"><option value="all">Vse generacije</option><option value="g0">Izvirniki (G0)</option><option value="kl">Kloni</option></select><span class="grow"></span><input class="q" id="q" placeholder="Išči po imenu ali instrumentu …" value="${esc(q)}"></div>
     <div class="tw"><table><thead><tr><th>#</th>${COLS.map(c => `<th class="s ${c[2] || ''}" data-s="${c[0]}">${c[1]}${sortK === c[0] ? (sortD > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('')}<th class="s n" data-s="st">Stanje</th></tr></thead><tbody>
-    ${L.map((a, i) => `<tr data-a="${a.id}"><td class="muted">${i + 1}</td><td><span class="nm-l">${esc(a.name)}</span><span class="sub">${esc(a.instr.join(', '))}${a.tf ? ' · ' + esc(a.tf) : ''}</span></td><td><span class="b">${a.sp ? 'Posebni' : 'Navadni'}</span></td><td class="n">${a.bal != null ? fE(a.bal) : '—'}</td><td class="n ${pn(a.r + a.openR)}">${fR(a.r + a.openR)}</td><td class="n">${a.n}</td><td class="n">${a.wr == null ? '—' : Math.round(a.wr * 100) + ' %'}</td><td class="muted">${ago(a.last)}</td>
+    ${L.map((a, i) => `<tr data-a="${a.id}"><td class="muted">${i + 1}</td><td><span class="nm-l">${esc(a.name)}</span><span class="sub">${esc(a.instr.join(', '))}${a.tf ? ' · ' + esc(a.tf) : ''}</span></td><td><span class="b">${a.gen ? 'G' + a.gen + ' · klon' : 'G0 · izvirnik'}</span></td><td class="n">${a.bal != null ? fE(a.bal) : '—'}</td><td class="n ${pn(a.r + a.openR)}">${fR(a.r + a.openR)}</td><td class="n">${a.n}</td><td class="n">${a.wr == null ? '—' : Math.round(a.wr * 100) + ' %'}</td><td class="muted">${ago(a.last)}</td>
       <td><div class="stc"><span>${esc(a.st.t)}</span>${lamp(a.st)}</div></td></tr>`).join('') || '<tr><td colspan="10"><div class="empty">Ni agentov</div></td></tr>'}</tbody></table></div></div>`;
   $('kf').value = kindF; $('kf').onchange = e => { kindF = e.target.value; render(); };
   $('q').oninput = e => { q = e.target.value; const p = e.target.selectionStart; render(); $('q').focus(); $('q').setSelectionRange(p, p); };
@@ -268,7 +271,7 @@ function act(c, id) {
 function detail(id) {
   const a = LIVE.agents.find(x => x.id === id); if (!a) return;
   const T = a.trades.slice().reverse();
-  $('mbox').innerHTML = `<div style="display:flex;align-items:center;gap:10px">${lamp(a.st)}<h2>${esc(a.name)}</h2><span class="b">${a.sp ? 'Posebni' : 'Navadni'}</span></div><p class="muted" style="margin:4px 0 16px">${esc(a.st.t)} · ${esc(a.instr.join(', '))}${a.floor ? ' · ' + esc(a.floor) : ''}${a.sp ? ` · ${a.lessons} lekcij${a.frozen ? ' · zamrznjen' : ''}` : ' · ' + esc(a.tactics.join(' + '))}</p>
+  $('mbox').innerHTML = `<div style="display:flex;align-items:center;gap:10px">${lamp(a.st)}<h2>${esc(a.name)}</h2><span class="b">${a.gen ? 'G' + a.gen + ' · klon' : 'G0 · izvirnik'}</span></div><p class="muted" style="margin:4px 0 16px">${esc(a.st.t)} · ${esc(a.instr.join(', '))}${a.floor ? ' · ' + esc(a.floor) : ''}${a.sp ? ` · ${a.lessons} lekcij${a.frozen ? ' · zamrznjen' : ''}` : ' · ' + esc(a.tactics.join(' + '))}</p>
     <div class="kr" style="margin-bottom:14px"><div class="k"><small>Račun</small><b>${a.bal != null ? fE(a.bal) : '—'}</b><span>začetek ${a.start != null ? fE(a.start) : '—'}</span></div><div class="k"><small>Skupaj R</small><b class="${pn(a.r)}">${fR(a.r)}</b><span>${a.n} tradov</span></div><div class="k"><small>Win %</small><b>${a.wr == null ? '—' : Math.round(a.wr * 100) + ' %'}</b><span>zadnji ${ago(a.last)}</span></div><div class="k"><small>Odprto</small><b class="${pn(a.openR)}">${a.open.length ? fR(a.openR) : '—'}</b><span>${a.open.length} odprtih</span></div></div>
     <div class="card" style="margin:0 0 14px"><div class="ch"><h3>Zadnji tradi<small>${T.length}</small></h3></div><div class="tw" style="max-height:320px;overflow:auto"><table><thead><tr><th>Čas</th><th>Instrument</th><th>Smer</th><th class="n">Vstop</th><th class="n">Izhod</th><th class="n">R</th><th>Razlog</th></tr></thead><tbody>${T.map(t => `<tr><td class="muted">${dt(t.time)}</td><td>${esc(t.instr)} <span class="muted">${esc(t.tf || '')}</span></td><td><span class="b ${t.dir === 1 ? 'g' : 'r'}">${t.dir === 1 ? 'LONG' : 'SHORT'}</span></td><td class="n">${t.entry ?? '—'}</td><td class="n">${t.exit ?? '—'}</td><td class="n ${pn(t.r)}">${t.r == null ? '—' : fR(t.r)}</td><td class="w muted">${esc(t.why)}</td></tr>`).join('') || '<tr><td colspan="7"><div class="empty">Ni tradov</div></td></tr>'}</tbody></table></div></div>
     ${(a.log || []).length ? `<div class="card" style="margin:0"><div class="ch"><h3>Dnevnik</h3></div>${a.log.slice().reverse().map(l => `<div class="fi"><time>${dt(l.t)}</time><span class="t" style="white-space:normal">${esc(l.txt)}</span></div>`).join('')}</div>` : ''}
@@ -282,7 +285,7 @@ function ultron(el, stale) { const M = LIVE.mood || {}, c = { zadovoljen: 'green
   el.innerHTML = head('Ultron', 'Nadzornik agentov') + stale + `<div class="card"><div class="ai" style="border-right:0;cursor:default"><div class="nm"><b>ULTRON</b><small>${esc(M.why || 'agenti in boti delajo normalno')}</small></div><span class="muted">${esc(({ zadovoljen: 'Zadovoljen', jezen: 'Jezen', zaskrbljen: 'Zaskrbljen' })[M.m] || 'Nadzoruje')}</span>${lamp({ c, t: '' })}</div></div><div class="card"><div class="ch"><h3>Dnevnik</h3></div>${logTable(LIVE.ultron)}</div>`;}
 function lab(el, stale) { el.innerHTML = head('Laboratorij', 'Dnevnik laboratorija — backtest, preizkuševalnica in rojstva agentov tečejo na računalniku') + stale + `<div class="card">${logTable(LIVE.lab)}</div>`; }
 function kos(el, stale) {
-  el.innerHTML = head('Koš', 'Izbrisani agenti — vrneš jih v aplikaciji (30 dni)') + stale + `<div class="card"><div class="tw"><table><thead><tr><th>Agent</th><th>Vrsta</th><th class="n">Tradi</th><th class="n">R</th><th>Izbrisan</th></tr></thead><tbody>${LIVE.trash.slice().reverse().map(t => `<tr><td>${esc(t.name)}</td><td><span class="b">${t.kind === 'special' ? 'Posebni' : 'Navadni'}</span></td><td class="n">${t.n}</td><td class="n ${pn(t.r)}">${fR(t.r)}</td><td class="muted">${dt(t.at)}</td></tr>`).join('') || '<tr><td colspan="5"><div class="empty"><b>Koš je prazen</b></div></td></tr>'}</tbody></table></div></div>`;
+  el.innerHTML = head('Koš', 'Izbrisani agenti — vrneš jih v aplikaciji (30 dni)') + stale + `<div class="card"><div class="tw"><table><thead><tr><th>Agent</th><th></th><th class="n">Tradi</th><th class="n">R</th><th>Izbrisan</th></tr></thead><tbody>${LIVE.trash.slice().reverse().map(t => `<tr><td>${esc(t.name)}</td><td><span class="b">—</span></td><td class="n">${t.n}</td><td class="n ${pn(t.r)}">${fR(t.r)}</td><td class="muted">${dt(t.at)}</td></tr>`).join('') || '<tr><td colspan="5"><div class="empty"><b>Koš je prazen</b></div></td></tr>'}</tbody></table></div></div>`;
 }
 const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
