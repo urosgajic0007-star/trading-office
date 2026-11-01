@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trading Office Web</title>
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="config.js" onerror="window.TO_CONFIG=window.TO_CONFIG||null"></script>
+<style>
+:root { --bg:#f4f4f5; --panel:#fff; --panel2:#fafafa; --panel3:#f1f1f2; --line:#e4e4e7; --line2:#d4d4d8; --text:#09090b; --muted:#71717a; --faint:#a1a1aa; --accent:#09090b; --accent-fg:#fff; --green:#15803d; --red:#b91c1c; --gold:#b45309; --side:#09090b; --rad:8px; --mono:'JetBrains Mono',Consolas,monospace; }
+:root.dark { --bg:#0a0a0a; --panel:#111; --panel2:#181818; --panel3:#1f1f1f; --line:#262626; --line2:#333; --text:#fafafa; --muted:#a1a1a1; --faint:#6b6b6b; --accent:#fafafa; --accent-fg:#0a0a0a; --green:#22c55e; --red:#ef4444; --gold:#f59e0b; --side:#000; }
+* { box-sizing:border-box; } html,body { margin:0; height:100%; }
+body { font:14px/1.45 Inter,'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); }
+.hidden { display:none !important; } .muted { color:var(--muted); } .pos { color:var(--green); } .neg { color:var(--red); } .mono { font-family:var(--mono); letter-spacing:-.02em; }
+button { font:inherit; }
+/* prijava */
+#login { position:fixed; inset:0; display:grid; grid-template-columns:minmax(0,44%) 1fr; background:var(--panel); z-index:50; }
+.l-left { background:#000; color:#fafafa; padding:44px 48px; display:flex; flex-direction:column; justify-content:space-between; }
+.brand { display:flex; align-items:center; gap:10px; font-weight:600; }
+.mark { width:28px; height:28px; border-radius:7px; background:#fafafa; color:#000; display:grid; place-items:center; font:700 11px Inter; }
+.l-left h2 { font-size:30px; line-height:1.2; letter-spacing:-.025em; margin:0 0 12px; font-weight:600; max-width:420px; }
+.l-left p { color:#a1a1a1; max-width:400px; line-height:1.6; margin:0; }
+.l-right { display:grid; place-items:center; padding:28px; }
+form.lf { width:100%; max-width:360px; } form.lf h1 { font-size:24px; margin:0 0 6px; letter-spacing:-.02em; } form.lf > p { color:var(--muted); margin:0 0 24px; }
+label { display:block; font-size:13px; font-weight:500; margin:0 0 14px; }
+input, select { display:block; width:100%; height:40px; margin-top:6px; padding:0 12px; border:1px solid var(--line2); border-radius:6px; background:var(--panel); color:var(--text); font:14px Inter,sans-serif; outline:none; }
+input:focus { border-color:var(--text); }
+.bp { width:100%; height:40px; border:0; border-radius:6px; background:var(--accent); color:var(--accent-fg); font-weight:600; cursor:pointer; }
+.err { color:var(--red); font-size:13px; min-height:20px; margin-top:10px; }
+.note { margin-top:24px; padding-top:16px; border-top:1px solid var(--line); color:var(--faint); font-size:12px; }
+@media (max-width:820px) { #login { grid-template-columns:1fr; } .l-left { display:none; } }
+/* ogrodje */
+#app { display:grid; grid-template-columns:240px 1fr; height:100vh; }
+#side { background:var(--side); color:#d4d4d8; display:flex; flex-direction:column; border-right:1px solid #1c1c1c; }
+#side .brand { height:56px; padding:0 18px; border-bottom:1px solid #1c1c1c; color:#fafafa; font-size:14px; }
+#side .brand small { font:600 10px Inter; color:#000; background:#a3a3a3; border-radius:4px; padding:1px 5px; letter-spacing:.06em; }
+nav { padding:10px; flex:1; overflow:auto; }
+.ni { display:flex; align-items:center; gap:11px; height:38px; padding:0 10px; border-radius:6px; cursor:pointer; font-size:13.5px; }
+.ni:hover { background:#141414; color:#fff; } .ni.act { background:#1c1c1c; color:#fff; font-weight:500; }
+.ni svg { width:17px; height:17px; stroke:currentColor; } .ni b { margin-left:auto; font-weight:400; color:#737373; font-size:11px; }
+.sf { border-top:1px solid #1c1c1c; padding:12px 18px; font-size:11px; color:#737373; }
+#body { display:flex; flex-direction:column; min-width:0; min-height:0; }
+header { height:56px; flex-shrink:0; display:flex; align-items:center; gap:10px; padding:0 18px; background:var(--panel); border-bottom:1px solid var(--line); }
+.ib { width:34px; height:34px; border-radius:6px; border:0; background:transparent; color:var(--muted); display:grid; place-items:center; cursor:pointer; }
+.ib:hover { background:var(--panel3); color:var(--text); } .ib svg { width:18px; height:18px; stroke:currentColor; }
+.chip { display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); padding:0 10px; height:34px; border:1px solid var(--line); border-radius:6px; white-space:nowrap; }
+.grow { flex:1; }
+.av { width:30px; height:30px; border-radius:50%; background:var(--text); color:var(--bg); display:grid; place-items:center; font-weight:600; font-size:12px; }
+#menu { display:none; }
+main { flex:1; overflow:auto; } #page { padding:22px 26px 40px; max-width:1600px; }
+.ph { display:flex; justify-content:space-between; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
+.ph h1 { margin:0; font-size:22px; letter-spacing:-.02em; font-weight:600; } .ph p { margin:4px 0 0; color:var(--muted); font-size:13px; }
+.crumb { font-size:12.5px; color:var(--muted); margin-bottom:6px; }
+.kr { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-bottom:18px; }
+.k { background:var(--panel); border:1px solid var(--line); border-radius:var(--rad); padding:16px 18px; position:relative; overflow:hidden; }
+.k::after { content:''; position:absolute; left:0; right:0; top:0; height:1px; background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--text) 35%,transparent),transparent); }
+.k small { color:var(--muted); font-size:12.5px; font-weight:500; } .k b { display:block; font:600 24px var(--mono); letter-spacing:-.03em; margin:8px 0 2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .k span { font-size:12px; color:var(--muted); }
+.grid { display:grid; grid-template-columns:repeat(12,1fr); gap:18px; align-items:start; }
+.c12 { grid-column:span 12; } .c8 { grid-column:span 8; } .c4 { grid-column:span 4; }
+@media (max-width:1100px) { .c8,.c4 { grid-column:span 12; } }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:var(--rad); margin-bottom:18px; overflow:hidden; }
+.grid > .card { margin:0; }
+.ch { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.ch h3 { margin:0; font-size:14px; font-weight:600; } .ch h3 small { color:var(--muted); font-weight:400; margin-left:6px; }
+.cb { padding:16px 18px; } .flush { padding:0; }
+.lg { display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--muted); } .lg span { display:inline-flex; align-items:center; gap:6px; }
+.lamp { display:inline-block; width:10px; height:10px; border-radius:50%; flex-shrink:0; background:var(--lc,#8a8a8a); box-shadow:0 0 0 2px color-mix(in srgb,var(--lc,#8a8a8a) 22%,transparent),0 0 10px 1px color-mix(in srgb,var(--lc,#8a8a8a) 75%,transparent); }
+.lamp.green { --lc:#22e07a; } .lamp.red { --lc:#ff3b4e; } .lamp.blue { --lc:#3b9bff; } .lamp.amber { --lc:#ffb020; } .lamp.orange { --lc:#ff7a1a; } .lamp.gray { --lc:#7c7c86; box-shadow:0 0 0 2px rgba(124,124,134,.18); }
+.lamp.green,.lamp.red { animation:pulse 2.2s ease-in-out infinite; } .lamp.blue,.lamp.amber { animation:pulse 3.4s ease-in-out infinite; }
+@keyframes pulse { 50% { box-shadow:0 0 0 4px color-mix(in srgb,var(--lc) 14%,transparent),0 0 16px 3px color-mix(in srgb,var(--lc) 85%,transparent); } }
+.al { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); }
+.ai { display:flex; align-items:center; gap:12px; padding:11px 18px; border-bottom:1px solid var(--line); border-right:1px solid var(--line); cursor:pointer; min-width:0; position:relative; }
+.ai:hover { background:var(--panel2); }
+.ai:has(.lamp.green) { background:linear-gradient(90deg,color-mix(in srgb,#22e07a 7%,transparent),transparent 55%); } .ai:has(.lamp.red) { background:linear-gradient(90deg,color-mix(in srgb,#ff3b4e 7%,transparent),transparent 55%); }
+.ai:has(.lamp.green)::before,.ai:has(.lamp.red)::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; background:var(--lc2); box-shadow:0 0 8px var(--lc2); }
+.ai:has(.lamp.green) { --lc2:#22e07a; } .ai:has(.lamp.red) { --lc2:#ff3b4e; }
+.ai .nm { flex:1; min-width:0; } .ai .nm b { display:block; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .ai .nm small { display:block; font-size:11.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.ai .rv { font:12.5px var(--mono); }
+.tools { display:flex; gap:8px; align-items:center; padding:12px 18px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.tools input, .tools select { width:auto; height:34px; margin:0; font-size:13px; } .tools .q { width:260px; max-width:100%; }
+.tw { overflow-x:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; font-size:11.5px; font-weight:500; color:var(--muted); padding:9px 14px; background:var(--panel2); border-bottom:1px solid var(--line); white-space:nowrap; cursor:default; }
+th.s { cursor:pointer; } th.s:hover { color:var(--text); }
+td { padding:10px 14px; border-bottom:1px solid var(--line); white-space:nowrap; } tr:last-child td { border-bottom:0; } tbody tr:hover td { background:var(--panel2); }
+td.n, th.n { text-align:right; } td.n { font-family:var(--mono); } td.w { white-space:normal; min-width:240px; }
+.nm-l { font-weight:500; cursor:pointer; } .nm-l:hover { text-decoration:underline; } .sub { display:block; font-size:11.5px; color:var(--muted); }
+.b { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:999px; font-size:11.5px; font-weight:500; border:1px solid var(--line); color:var(--muted); white-space:nowrap; }
+.b.g { color:var(--green); border-color:color-mix(in srgb,var(--green) 35%,transparent); } .b.r { color:var(--red); border-color:color-mix(in srgb,var(--red) 35%,transparent); }
+.btn { display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 14px; border-radius:6px; border:1px solid var(--line2); background:var(--panel); color:var(--text); font-size:13px; font-weight:500; cursor:pointer; white-space:nowrap; }
+.btn:hover { background:var(--panel3); } a.btn { text-decoration:none; } .chip:empty { display:none; } .btn.pri { background:var(--accent); color:var(--accent-fg); border-color:var(--accent); } .btn.dan { color:var(--red); } .btn.sm { height:28px; padding:0 10px; font-size:12px; }
+.btn svg { width:15px; height:15px; stroke:currentColor; }
+.ops { display:flex; gap:4px; justify-content:flex-end; }
+.stc { display:flex; align-items:center; gap:9px; justify-content:flex-end; } .stc span { color:var(--muted); font-size:12.5px; }
+.empty { padding:40px 18px; text-align:center; color:var(--muted); } .empty b { display:block; color:var(--text); font-weight:500; margin-bottom:4px; }
+.fi { display:flex; gap:12px; padding:10px 18px; border-bottom:1px solid var(--line); font-size:13px; } .fi:last-child { border-bottom:0; }
+.fi time { color:var(--faint); font:12px var(--mono); width:92px; flex-shrink:0; } .fi .w { font-weight:500; flex-shrink:0; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .fi .t { color:var(--muted); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#modal { position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; justify-content:center; align-items:flex-start; padding:6vh 16px; z-index:40; overflow:auto; }
+#mbox { background:var(--panel); border:1px solid var(--line); border-radius:12px; width:min(900px,100%); padding:24px; box-shadow:0 20px 50px rgba(0,0,0,.35); }
+#mbox h2 { margin:0 0 4px; font-size:18px; } .acts { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; border-top:1px solid var(--line); padding-top:14px; margin-top:18px; }
+#toast { position:fixed; right:20px; bottom:20px; background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--text); border-radius:8px; padding:12px 16px; font-size:13px; max-width:360px; z-index:60; box-shadow:0 10px 30px rgba(0,0,0,.25); }
+.stale { background:color-mix(in srgb,var(--gold) 12%,var(--panel)); border:1px solid color-mix(in srgb,var(--gold) 40%,var(--line)); color:var(--text); border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:13px; }
+@media (max-width:820px) {
+  #app { grid-template-columns:1fr; } #side { position:fixed; left:0; top:0; bottom:0; width:250px; z-index:30; transform:translateX(-100%); transition:transform .2s; } #side.open { transform:none; }
+  #menu { display:grid; } #page { padding:16px 14px 40px; } .chip.hm { display:none; } .tools .q { width:100%; }
+}
+</style>
+</head>
+<body>
+<div id="login">
+  <div class="l-left"><div class="brand"><span class="mark">TO</span>Trading Office <span style="color:#737373;font-weight:400">Web</span></div>
+    <div><h2>Tvoji agenti, od kjerkoli.</h2><p>Stanje agentov, odprti tradi, broker boti in Ultron v živo. Računalnik trguje, ti spremljaš s katerekoli naprave.</p></div>
+    <div style="color:#525252;font-size:12px">Trading Office Web</div></div>
+  <div class="l-right">
+    <form class="lf" id="cfgf" class="hidden"><h1>Povezava</h1><p>Prvič na tej napravi — vpiši podatke svojega Supabase projekta.</p>
+      <label>Supabase URL<input id="c-url" placeholder="https://xxxx.supabase.co" required></label>
+      <label>Anon (public) ključ<input id="c-anon" required></label>
+      <button class="bp">Naprej</button><div class="err" id="c-err"></div></form>
+    <form class="lf hidden" id="lf"><h1 id="l-h">Prijava</h1><p id="l-p">Prijavi se v svojo nadzorno ploščo.</p>
+      <div id="l-main"><label>E-pošta<input id="l-email" type="email" autocomplete="username" required></label>
+      <label>Geslo<input id="l-pass" type="password" autocomplete="current-password" required minlength="6"></label>
+      <label id="l-p2w" class="hidden">Ponovi geslo<input id="l-pass2" type="password" autocomplete="new-password"></label></div>
+      <div id="l-codew" class="hidden"><label>Koda iz e-pošte<input id="l-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="font:600 20px var(--mono);letter-spacing:.3em;text-align:center"></label></div>
+      <button class="bp" id="l-btn">Prijava</button><div class="err" id="l-err"></div>
+      <div style="margin-top:14px;font-size:13px;color:var(--muted);text-align:center" id="l-sw"></div>
+      <div class="note">Spletna stran je samo za spremljanje — nastavitve in upravljanje so v aplikaciji na računalniku. Gesla za brokerja nikoli ne zapustijo računalnika. <a href="#" id="l-reset" style="color:inherit">Spremeni povezavo</a></div></form>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <aside id="side"><div class="brand"><span class="mark">TO</span>Trading Office <small>WEB</small></div><nav id="nav"></nav><div class="sf" id="sf"></div></aside>
+  <div id="body">
+    <header><button class="ib" id="menu"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="chip" id="pc"></div><span class="grow"></span><div class="chip hm" id="mk"></div>
+      <button class="ib" id="theme" title="Tema"></button><button class="ib" id="rel" title="Osveži"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></svg></button>
+      <span class="av" id="av" title="Odjava">U</span></header>
+    <main><div id="page"></div></main>
+  </div>
+</div>
+<div id="modal" class="hidden"><div id="mbox"></div></div>
+<div id="toast" class="hidden"></div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id), esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const LS = { get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+let CFG = (window.TO_CONFIG && window.TO_CONFIG.url) ? window.TO_CONFIG : LS.get('toWebCfg');
+let SES = LS.get('toWebSes'), LIVE = null, FULL = null, page = location.hash.slice(1) || 'dash', sortK = 'r', sortD = -1, q = '', kindF = 'all';
+const IC = { home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>', users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/>', activity: '<path d="M3 12h4l3-8 4 16 3-8h4"/>', brief: '<rect x="3" y="7" width="18" height="13" rx="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>', shield: '<path d="M12 3 4 6v6c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V6z"/>', flask: '<path d="M9 3h6"/><path d="M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/>', trash: '<path d="M4 7h16"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/>', gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>', sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', down: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>', moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>' };
+const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${IC[n] || ''}</svg>`;
+const fR = v => { v = Math.round((+v || 0) * 100) / 100; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R'; }, pn = v => (+v > 0 ? 'pos' : +v < 0 ? 'neg' : '');
+const fE = v => (+v || 0).toLocaleString('sl-SI', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+const ago = t => { if (!t) return '—'; const m = Math.round((Date.now() - t) / 60000); return m < 1 ? 'zdaj' : m < 60 ? `pred ${m} min` : m < 1440 ? `pred ${Math.round(m / 60)} h` : `pred ${Math.round(m / 1440)} d`; };
+const dt = t => new Date(t).toLocaleString('sl-SI', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' });
+const lamp = s => `<i class="lamp ${s.c}" title="${esc(s.t)}"></i>`;
+const toast = t => { const e = $('toast'); e.textContent = t; e.classList.remove('hidden'); clearTimeout(toast.tm); toast.tm = setTimeout(() => e.classList.add('hidden'), 4000); };
+const theme = () => { const d = LS.get('toWebDark') ?? matchMedia('(prefers-color-scheme: dark)').matches; document.documentElement.classList.toggle('dark', !!d); $('theme').innerHTML = ic(d ? 'sun' : 'moon'); };
+$('theme').onclick = () => { LS.set('toWebDark', !document.documentElement.classList.contains('dark')); theme(); }; theme();
+
+// ---------- Supabase (REST, brez knjižnic) ----------
+const U = p => CFG.url.replace(/\/+$/, '') + p;
+async function auth(body, grant) { const r = await fetch(U('/auth/v1/token?grant_type=' + grant), { method: 'POST', headers: { apikey: CFG.anon, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({})); if (!r.ok || !j.access_token) throw new Error(trErr(j.error_description || j.msg || 'Napačna e-pošta ali geslo')); SES = { tok: j.access_token, ref: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000 - 60e3, email: j.user && j.user.email }; LS.set('toWebSes', SES); }
+async function tok() { if (SES && Date.now() < SES.exp) return SES.tok; if (!SES || !SES.ref) throw new Error('prijava'); await auth({ refresh_token: SES.ref }, 'refresh_token'); return SES.tok; }
+async function api(path, opt = {}) { const t = await tok(); const r = await fetch(U('/rest/v1/' + path), { ...opt, headers: { apikey: CFG.anon, Authorization: 'Bearer ' + t, 'Content-Type': 'application/json', ...(opt.headers || {}) } }); if (r.status === 401) { SES = null; LS.set('toWebSes', null); showLogin(); throw new Error('seja potekla'); } if (!r.ok) throw new Error((await r.text()).slice(0, 160)); const x = await r.text(); return x ? JSON.parse(x) : null; }
+async function cmdUnused(c, label) { await api('to_cmd', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ cmd: c }) }); toast(`${label} — poslano računalniku (izvede v nekaj sekundah)`); setTimeout(load, 7000); }
+
+// ---------- prijava ----------
+function showLogin() { $('app').classList.add('hidden'); $('login').classList.remove('hidden'); $('cfgf').classList.toggle('hidden', !!CFG); $('lf').classList.toggle('hidden', !CFG); }
+$('cfgf').onsubmit = e => { e.preventDefault(); const url = $('c-url').value.trim(), anon = $('c-anon').value.trim(); if (!/^https?:\/\//.test(url)) return $('c-err').textContent = 'URL se mora začeti s https://'; CFG = { url, anon }; LS.set('toWebCfg', CFG); showLogin(); };
+$('l-reset').onclick = e => { e.preventDefault(); LS.set('toWebCfg', null); CFG = window.TO_CONFIG && window.TO_CONFIG.url ? null : null; showLogin(); };
+let mode = 'login'; // login | signup | code
+function setMode(m) { mode = m; const t = { login: ['Prijava', 'Prijavi se v svojo nadzorno ploščo.', 'Prijava', 'Še nimaš računa? <a href="#" data-m="signup">Ustvari račun</a>'], signup: ['Ustvari račun', 'Na e-pošto dobiš kodo za potrditev.', 'Pošlji kodo', 'Že imaš račun? <a href="#" data-m="login">Prijava</a>'], code: ['Potrdi e-pošto', 'Vpiši kodo, ki smo jo poslali na ' + esc($('l-email').value.trim()) + '.', 'Potrdi in ustvari račun', '<a href="#" data-m="resend">Pošlji kodo znova</a> · <a href="#" data-m="signup">Nazaj</a>'] }[m];
+  $('l-h').textContent = t[0]; $('l-p').innerHTML = t[1]; $('l-btn').textContent = t[2]; $('l-sw').innerHTML = t[3]; $('l-err').textContent = '';
+  $('l-main').classList.toggle('hidden', m === 'code'); $('l-p2w').classList.toggle('hidden', m !== 'signup'); $('l-codew').classList.toggle('hidden', m !== 'code');
+  $('l-pass').autocomplete = m === 'signup' ? 'new-password' : 'current-password'; $('l-pass').required = m !== 'code'; $('l-email').required = m !== 'code'; if (m === 'code') setTimeout(() => $('l-code').focus(), 30); }
+$('l-sw').onclick = async e => { const a = e.target.closest('[data-m]'); if (!a) return; e.preventDefault(); if (a.dataset.m === 'resend') { try { await pub('/auth/v1/resend', { type: 'signup', email: $('l-email').value.trim() }); toast('Nova koda poslana'); } catch (er) { $('l-err').textContent = er.message; } return; } setMode(a.dataset.m); };
+async function pub(path, body) { const r = await fetch(U(path), { method: 'POST', headers: { apikey: CFG.anon, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(trErr(j.error_description || j.msg || j.message || 'Napaka ' + r.status)); return j; }
+const trErr = m => /Invalid login/i.test(m) ? 'Napačna e-pošta ali geslo' : /not confirmed/i.test(m) ? 'E-pošta še ni potrjena — ustvari račun znova za novo kodo' : /already registered|already been registered/i.test(m) ? 'Ta e-pošta že ima račun — prijavi se' : /expired|invalid/i.test(m) && /token|otp/i.test(m) ? 'Koda ni pravilna ali je potekla' : /rate limit/i.test(m) ? 'Preveč poskusov — počakaj nekaj minut' : /at least 6/i.test(m) ? 'Geslo naj ima vsaj 6 znakov' : /Signups not allowed/i.test(m) ? 'Ustvarjanje računov je izklopljeno' : m;
+$('lf').onsubmit = async e => { e.preventDefault(); $('l-err').textContent = ''; $('l-btn').disabled = true; const email = $('l-email').value.trim();
+  try {
+    if (mode === 'login') { await auth({ email, password: $('l-pass').value }, 'password'); enter(); }
+    else if (mode === 'signup') { if ($('l-pass').value.length < 6) throw new Error('Geslo naj ima vsaj 6 znakov'); if ($('l-pass').value !== $('l-pass2').value) throw new Error('Gesli se ne ujemata'); const j = await pub('/auth/v1/signup', { email, password: $('l-pass').value }); if (j.access_token) { SES = { tok: j.access_token, ref: j.refresh_token, exp: Date.now() + 3500e3, email }; LS.set('toWebSes', SES); return enter(); } if (j.identities && !j.identities.length) throw new Error('Ta e-pošta že ima račun — prijavi se'); setMode('code'); }
+    else { const code = $('l-code').value.replace(/\s/g, ''); const j = await pub('/auth/v1/verify', { type: 'signup', email, token: code }); if (!j.access_token) throw new Error('Koda ni pravilna'); SES = { tok: j.access_token, ref: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000 - 60e3, email }; LS.set('toWebSes', SES); toast('Račun ustvarjen'); enter(); }
+  } catch (er) { $('l-err').textContent = trErr(er.message); } finally { $('l-btn').disabled = false; } };
+setMode('login');
+$('av').onclick = () => { if (confirm('Odjava?')) { SES = null; LS.set('toWebSes', null); showLogin(); } };
+function enter() { $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('av').textContent = ((SES && SES.email) || 'U')[0].toUpperCase(); render(); load(); }
+
+// ---------- podatki ----------
+async function load() { try { const L = await api('to_live?select=data,updated_at'); LIVE = L && L[0] ? L[0].data : null; render(); } catch (e) { if (e.message !== 'seja potekla') $('pc').innerHTML = `<i class="lamp red"></i>${esc(e.message)}`; } }
+async function loadFull() { const L = await api('to_state?select=data,updated_at'); FULL = L && L[0] ? L[0] : null; return FULL; }
+setInterval(() => { if (!$('app').classList.contains('hidden') && !document.hidden) load(); }, 15000);
+$('rel').onclick = () => { load(); toast('Osveženo'); };
+
+// ---------- navigacija ----------
+const NAV = [['dash', 'Pregled', 'home'], ['dl', 'Prenesi aplikacijo', 'down'], ['agents', 'Agenti', 'users'], ['open', 'Odprti tradi', 'activity'], ['bots', 'Broker', 'brief'], ['ultron', 'Ultron', 'shield'], ['lab', 'Laboratorij', 'flask'], ['kos', 'Koš', 'trash'], ['set', 'Nastavitve', 'gear']];
+function nav() { const n = { agents: LIVE ? LIVE.agents.length : 0, open: LIVE ? LIVE.agents.filter(a => a.open.some(t => !t.pending)).length : 0, kos: LIVE ? LIVE.trash.length : 0, bots: LIVE ? LIVE.bots.length : 0 };
+  $('nav').innerHTML = NAV.map(([k, l, i]) => `<div class="ni ${page === k ? 'act' : ''}" data-p="${k}">${ic(i)}${l}${n[k] ? `<b>${n[k]}</b>` : ''}</div>`).join(''); }
+$('nav').onclick = e => { const n = e.target.closest('[data-p]'); if (!n) return; page = n.dataset.p; location.hash = page; $('side').classList.remove('open'); render(); };
+$('menu').onclick = () => $('side').classList.toggle('open');
+window.onhashchange = () => { const p = location.hash.slice(1); if (p && p !== page) { page = p; render(); } };
+const head = (t, s, a = '') => `<div class="ph"><div><div class="crumb">Trading Office Web${page !== 'dash' ? ' / ' + esc(t) : ''}</div><h1>${esc(t)}</h1>${s ? `<p>${s}</p>` : ''}</div><div style="display:flex;gap:8px">${a}</div></div>`;
+const LEG = `<div class="lg"><span><i class="lamp green"></i>v plusu</span><span><i class="lamp red"></i>v minusu</span><span><i class="lamp amber"></i>čaka</span><span><i class="lamp blue"></i>išče vstop</span><span><i class="lamp gray"></i>izven okna / ustavljen</span></div>`;
+
+function render() {
+  nav(); const el = $('page');
+  if (LIVE) { const age = Date.now() - LIVE.at, ok = age < 60e3; $('pc').innerHTML = `<i class="lamp ${ok ? 'green' : age < 600e3 ? 'amber' : 'red'}"></i>Računalnik ${ok ? 'povezan' : 'ni dosegljiv · ' + ago(LIVE.at)}`;
+    const F = LIVE.focus || {}, hm = h => String(Math.floor(h)).padStart(2, '0') + ':' + String(Math.round((h % 1) * 60)).padStart(2, '0'); $('mk').innerHTML = `<i class="lamp ${LIVE.inWin ? 'green' : 'gray'}"></i>${F.on ? `okno ${hm(F.from)}–${hm(F.to)} ${LIVE.inWin ? 'odprto' : 'zaprto'}` : ''}`;
+    $('sf').textContent = 'podatki: ' + dt(LIVE.at); }
+  if (!LIVE && page === 'dl') return dlP(el);
+  if (!LIVE) { el.innerHTML = head('Pregled', '') + `<div class="card"><div class="empty"><b>Ni podatkov iz računalnika</b>V aplikaciji Trading Office odpri Nastavitve → Trading Office Web in poveži oblak.</div></div>`; return; }
+  const stale = Date.now() - LIVE.at > 120e3 ? `<div class="stale">Računalnik zadnjič poslal podatke ${ago(LIVE.at)} — je ugasnjen ali aplikacija ni odprta? Prikazano je zadnje znano stanje.</div>` : '';
+  if (page === 'dl') return dlP(el);
+  ({ dash, agents, open: openP, bots: botsP, ultron, lab, kos, set: setP }[page] || dash)(el, stale);
+}
+const statusRank = { trade: 0, pend: 1, scan: 2, warn: 3, stop: 4, out: 5 };
+function agentItem(a) { const r = a.r + (a.openR || 0); return `<div class="ai" data-a="${a.id}"><div class="nm"><b>${esc(a.name)}</b><small>${esc(a.st.t)}</small></div><span class="rv ${pn(r)}">${fR(r)}</span>${lamp(a.st)}</div>`; }
+function botSt(b) { return b.stopped ? { c: 'red', t: 'Ustavljen' } : b.paused ? { c: 'amber', t: 'Dnevna pavza' } : !b.enabled ? { c: 'gray', t: 'Izklopljen' } : b.mirror ? { c: 'green', t: `V tradu · ${b.mirror.side === 'buy' ? 'LONG' : 'SHORT'} ${b.mirror.sym || ''} ${b.mirror.agent ? '(' + b.mirror.agent + ')' : ''}` } : { c: 'blue', t: 'Teče · čaka na trade' }; }
+function botItem(b) { const s = botSt(b), tot = b.start != null ? b.eq - b.start : 0; return `<div class="ai"><div class="nm"><b>${esc(b.name)} <span class="muted" style="font-weight:400;font-size:11.5px">${b.kind === 'hl' ? 'Hyperliquid' : 'TradeLocker'}</span></b><small>${esc(s.t)}</small></div><span class="rv">${b.eq.toFixed(2)} $</span><span class="rv ${pn(b.day)}">${b.day >= 0 ? '+' : '−'}${Math.abs(b.day).toFixed(2)}</span><span class="rv ${pn(tot)}">${tot >= 0 ? '+' : '−'}${Math.abs(tot).toFixed(2)}</span>${lamp(s)}</div>`; }
+function bindAgents(el) { el.querySelectorAll('[data-a]').forEach(n => n.onclick = e => { if (e.target.closest('button')) return; detail(n.dataset.a); }); }
+
+function dash(el, stale) {
+  const A = LIVE.agents, d0 = new Date().setHours(0, 0, 0, 0), today = A.flatMap(a => a.trades.filter(t => t.time >= d0 && t.r != null)), tR = today.reduce((s, t) => s + t.r, 0);
+  const inT = A.filter(a => a.open.some(t => !t.pending)), oR = inT.reduce((s, a) => s + (a.openR || 0), 0), bal = A.reduce((s, a) => s + (a.bal || 0), 0), st = A.reduce((s, a) => s + (a.start || 0), 0), tot = A.reduce((s, a) => s + a.r, 0);
+  const M = LIVE.mood || {}, k = (l, v, s, c = '') => `<div class="k"><small>${l}</small><b class="${c}">${v}</b><span>${s}</span></div>`;
+  const list = A.slice().sort((x, y) => (statusRank[x.st.k] - statusRank[y.st.k]) || (y.r - x.r));
+  const feed = [...LIVE.ultron.map(x => ({ t: x.t, w: 'Ultron', x: x.txt })), ...LIVE.lab.map(x => ({ t: x.t, w: 'Laboratorij', x: x.txt })), ...A.flatMap(a => (a.log || []).map(l => ({ t: l.t, w: a.name, x: l.txt })))].sort((a, b) => b.t - a.t).slice(0, 14);
+  el.innerHTML = head('Pregled', new Date().toLocaleDateString('sl-SI', { weekday: 'long', day: 'numeric', month: 'long' })) + stale +
+    `<div class="kr">${k('Agenti', A.length, `${A.filter(a => !a.sp).length} navadnih · ${A.filter(a => a.sp).length} posebnih`)}${k('V tradu', inT.length, inT.length ? 'odprto ' + fR(oR) : 'ni odprtih', pn(oR))}${k('Danes', fR(tR), today.length + ' tradov', pn(tR))}${k('Skupaj R', fR(tot), 'vsi zaključeni', pn(tot))}${k('Stanje računov', fE(bal), (bal - st >= 0 ? '+' : '−') + fE(Math.abs(bal - st)) + ' od začetka')}${k('Ultron', esc(({ zadovoljen: 'Zadovoljen', jezen: 'Jezen', zaskrbljen: 'Zaskrbljen' })[M.m] || 'Nadzoruje'), esc(M.why || ''))}</div>
+    <div class="grid"><div class="card c8"><div class="ch"><h3>Stanje agentov<small>${A.length}</small></h3>${LEG}</div><div class="al">${list.map(agentItem).join('') || '<div class="empty">Ni agentov</div>'}</div></div>
+      <div class="card c4"><div class="ch"><h3>Zadnja dejavnost</h3></div><div style="max-height:420px;overflow:auto">${feed.map(f => `<div class="fi"><time>${dt(f.t)}</time><span class="w">${esc(f.w)}</span><span class="t" title="${esc(f.x)}">${esc(f.x)}</span></div>`).join('') || '<div class="empty">—</div>'}</div></div>
+      <div class="card c12"><div class="ch"><h3>Broker agenti<small>${LIVE.bots.length}</small></h3></div><div class="al" style="grid-template-columns:repeat(auto-fill,minmax(380px,1fr))">${LIVE.bots.map(botItem).join('') || '<div class="empty">Ni broker botov</div>'}</div></div>
+      <div class="card c12"><div class="ch"><h3>Odprti tradi<small>${inT.length}</small></h3></div>${openTable()}</div></div>`;
+  bindAgents(el);
+}
+function openTable() { const R = LIVE.agents.flatMap(a => a.open.map(t => ({ a, t }))); return R.length ? `<div class="tw"><table><thead><tr><th>Agent</th><th>Instrument</th><th>Smer</th><th class="n">Vstop</th><th class="n">SL</th><th class="n">TP</th><th class="n">R zdaj</th><th>Odprt</th></tr></thead><tbody>${R.map(({ a, t }) => `<tr data-a="${a.id}"><td><span class="nm-l">${esc(a.name)}</span></td><td>${esc(t.instr)} <span class="muted">${esc(t.tf || '')}</span></td><td><span class="b ${t.dir === 1 ? 'g' : 'r'}">${t.pending ? 'čaka · ' : ''}${t.dir === 1 ? 'LONG' : 'SHORT'}</span></td><td class="n">${t.entry}</td><td class="n">${t.sl}</td><td class="n">${t.tp ?? '—'}</td><td class="n ${pn(t.r)}">${t.r == null ? '—' : fR(t.r)}</td><td class="muted">${ago(t.at)}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty"><b>Ni odprtih tradov</b></div>'; }
+function openP(el, stale) { el.innerHTML = head('Odprti tradi', 'Pozicije, ki jih agenti trenutno držijo') + stale + `<div class="card">${openTable()}</div>`; bindAgents(el); }
+function botsP(el, stale) { el.innerHTML = head('Broker', 'Pravi računi (TradeLocker, Hyperliquid) — nastavitve botov ostanejo na računalniku') + stale + `<div class="card"><div class="al" style="grid-template-columns:1fr">${LIVE.bots.map(botItem).join('') || '<div class="empty">Ni broker botov</div>'}</div></div>`; }
+
+function agents(el, stale) {
+  const COLS = [['name', 'Ime'], ['sp', 'Vrsta'], ['bal', 'Račun', 'n'], ['r', 'Skupaj R', 'n'], ['n', 'Tradi', 'n'], ['wr', 'Win %', 'n'], ['last', 'Zadnji trade']];
+  let L = LIVE.agents.filter(a => (kindF === 'all' || (kindF === 'sp') === a.sp) && (!q || (a.name + ' ' + a.instr.join(' ')).toLowerCase().includes(q.toLowerCase())));
+  const v = (a, k) => k === 'st' ? statusRank[a.st.k] : k === 'name' ? a.name.toLowerCase() : k === 'r' ? a.r + (a.openR || 0) : k === 'wr' ? (a.wr ?? -1) : a[k] ?? 0;
+  L.sort((x, y) => { const a = v(x, sortK), b = v(y, sortK); return (a > b ? 1 : a < b ? -1 : 0) * sortD; });
+  el.innerHTML = head('Agenti', 'Lučka na koncu vrstice kaže trenutno stanje') + stale + `<div class="card"><div class="tools"><select id="kf"><option value="all">Vse vrste</option><option value="ag">Navadni</option><option value="sp">Posebni</option></select><span class="grow"></span><input class="q" id="q" placeholder="Išči po imenu ali instrumentu …" value="${esc(q)}"></div>
+    <div class="tw"><table><thead><tr><th>#</th>${COLS.map(c => `<th class="s ${c[2] || ''}" data-s="${c[0]}">${c[1]}${sortK === c[0] ? (sortD > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('')}<th class="s n" data-s="st">Stanje</th></tr></thead><tbody>
+    ${L.map((a, i) => `<tr data-a="${a.id}"><td class="muted">${i + 1}</td><td><span class="nm-l">${esc(a.name)}</span><span class="sub">${esc(a.instr.join(', '))}${a.tf ? ' · ' + esc(a.tf) : ''}</span></td><td><span class="b">${a.sp ? 'Posebni' : 'Navadni'}</span></td><td class="n">${a.bal != null ? fE(a.bal) : '—'}</td><td class="n ${pn(a.r + a.openR)}">${fR(a.r + a.openR)}</td><td class="n">${a.n}</td><td class="n">${a.wr == null ? '—' : Math.round(a.wr * 100) + ' %'}</td><td class="muted">${ago(a.last)}</td>
+      <td><div class="stc"><span>${esc(a.st.t)}</span>${lamp(a.st)}</div></td></tr>`).join('') || '<tr><td colspan="10"><div class="empty">Ni agentov</div></td></tr>'}</tbody></table></div></div>`;
+  $('kf').value = kindF; $('kf').onchange = e => { kindF = e.target.value; render(); };
+  $('q').oninput = e => { q = e.target.value; const p = e.target.selectionStart; render(); $('q').focus(); $('q').setSelectionRange(p, p); };
+  el.querySelectorAll('[data-s]').forEach(t => t.onclick = () => { if (sortK === t.dataset.s) sortD *= -1; else { sortK = t.dataset.s; sortD = t.dataset.s === 'name' ? 1 : -1; } render(); });
+  bindAgents(el);
+}
+function act(c, id) {
+  const a = LIVE.agents.find(x => x.id === id); if (!a) return;
+  const L = { clone: `Kloniram agenta ${a.name}? Klon dobi enako znanje in taktike, nov račun.`, delete: `Izbrišem agenta ${a.name}? Gre v koš na računalniku (30 dni ga lahko vrneš).`, pause: `Ustavim agenta ${a.name}? Ne bo odpiral novih tradov.`, resume: `Zaženem agenta ${a.name}?` };
+  if (!confirm(L[c])) return; cmd({ type: c, id }, ({ clone: 'Kloniranje', delete: 'Brisanje', pause: 'Ustavitev', resume: 'Zagon' })[c]);
+}
+function detail(id) {
+  const a = LIVE.agents.find(x => x.id === id); if (!a) return;
+  const T = a.trades.slice().reverse();
+  $('mbox').innerHTML = `<div style="display:flex;align-items:center;gap:10px">${lamp(a.st)}<h2>${esc(a.name)}</h2><span class="b">${a.sp ? 'Posebni' : 'Navadni'}</span></div><p class="muted" style="margin:4px 0 16px">${esc(a.st.t)} · ${esc(a.instr.join(', '))}${a.floor ? ' · ' + esc(a.floor) : ''}${a.sp ? ` · ${a.lessons} lekcij${a.frozen ? ' · zamrznjen' : ''}` : ' · ' + esc(a.tactics.join(' + '))}</p>
+    <div class="kr" style="margin-bottom:14px"><div class="k"><small>Račun</small><b>${a.bal != null ? fE(a.bal) : '—'}</b><span>začetek ${a.start != null ? fE(a.start) : '—'}</span></div><div class="k"><small>Skupaj R</small><b class="${pn(a.r)}">${fR(a.r)}</b><span>${a.n} tradov</span></div><div class="k"><small>Win %</small><b>${a.wr == null ? '—' : Math.round(a.wr * 100) + ' %'}</b><span>zadnji ${ago(a.last)}</span></div><div class="k"><small>Odprto</small><b class="${pn(a.openR)}">${a.open.length ? fR(a.openR) : '—'}</b><span>${a.open.length} odprtih</span></div></div>
+    <div class="card" style="margin:0 0 14px"><div class="ch"><h3>Zadnji tradi<small>${T.length}</small></h3></div><div class="tw" style="max-height:320px;overflow:auto"><table><thead><tr><th>Čas</th><th>Instrument</th><th>Smer</th><th class="n">Vstop</th><th class="n">Izhod</th><th class="n">R</th><th>Razlog</th></tr></thead><tbody>${T.map(t => `<tr><td class="muted">${dt(t.time)}</td><td>${esc(t.instr)} <span class="muted">${esc(t.tf || '')}</span></td><td><span class="b ${t.dir === 1 ? 'g' : 'r'}">${t.dir === 1 ? 'LONG' : 'SHORT'}</span></td><td class="n">${t.entry ?? '—'}</td><td class="n">${t.exit ?? '—'}</td><td class="n ${pn(t.r)}">${t.r == null ? '—' : fR(t.r)}</td><td class="w muted">${esc(t.why)}</td></tr>`).join('') || '<tr><td colspan="7"><div class="empty">Ni tradov</div></td></tr>'}</tbody></table></div></div>
+    ${(a.log || []).length ? `<div class="card" style="margin:0"><div class="ch"><h3>Dnevnik</h3></div>${a.log.slice().reverse().map(l => `<div class="fi"><time>${dt(l.t)}</time><span class="t" style="white-space:normal">${esc(l.txt)}</span></div>`).join('')}</div>` : ''}
+    <div class="acts"><button class="btn pri" id="mx">Zapri</button></div>`;
+  $('modal').classList.remove('hidden'); $('mx').onclick = () => $('modal').classList.add('hidden');
+}
+$('modal').onmousedown = e => { if (e.target.id === 'modal') $('modal').classList.add('hidden'); };
+document.onkeydown = e => { if (e.key === 'Escape') $('modal').classList.add('hidden'); };
+function logTable(L) { return `<div class="tw"><table><thead><tr><th>Čas</th><th>Sporočilo</th></tr></thead><tbody>${L.slice().reverse().map(x => `<tr><td class="muted" style="width:1%">${dt(x.t)}</td><td class="w">${esc(x.txt)}</td></tr>`).join('') || '<tr><td colspan="2"><div class="empty">Ni zapisov</div></td></tr>'}</tbody></table></div>`; }
+function ultron(el, stale) { const M = LIVE.mood || {}, c = { zadovoljen: 'green', jezen: 'red', zaskrbljen: 'amber' }[M.m] || 'blue';
+  el.innerHTML = head('Ultron', 'Nadzornik agentov') + stale + `<div class="card"><div class="ai" style="border-right:0;cursor:default"><div class="nm"><b>ULTRON</b><small>${esc(M.why || 'agenti in boti delajo normalno')}</small></div><span class="muted">${esc(({ zadovoljen: 'Zadovoljen', jezen: 'Jezen', zaskrbljen: 'Zaskrbljen' })[M.m] || 'Nadzoruje')}</span>${lamp({ c, t: '' })}</div></div><div class="card"><div class="ch"><h3>Dnevnik</h3></div>${logTable(LIVE.ultron)}</div>`;}
+function lab(el, stale) { el.innerHTML = head('Laboratorij', 'Dnevnik laboratorija — backtest, preizkuševalnica in rojstva agentov tečejo na računalniku') + stale + `<div class="card">${logTable(LIVE.lab)}</div>`; }
+function kos(el, stale) {
+  el.innerHTML = head('Koš', 'Izbrisani agenti — vrneš jih v aplikaciji (30 dni)') + stale + `<div class="card"><div class="tw"><table><thead><tr><th>Agent</th><th>Vrsta</th><th class="n">Tradi</th><th class="n">R</th><th>Izbrisan</th></tr></thead><tbody>${LIVE.trash.slice().reverse().map(t => `<tr><td>${esc(t.name)}</td><td><span class="b">${t.kind === 'special' ? 'Posebni' : 'Navadni'}</span></td><td class="n">${t.n}</td><td class="n ${pn(t.r)}">${fR(t.r)}</td><td class="muted">${dt(t.at)}</td></tr>`).join('') || '<tr><td colspan="5"><div class="empty"><b>Koš je prazen</b></div></td></tr>'}</tbody></table></div></div>`;
+}
+function dlP(el) {
+  const C = window.TO_CONFIG || {}, repo = C.repo, v = C.version || '', base = repo ? `https://github.com/${repo}/releases/latest/download/` : '';
+  const item = (t, d, f) => `<div class="ai" style="border-right:0;cursor:default"><div class="nm"><b>${t}</b><small>${d}</small></div>${repo ? `<a class="btn pri" href="${base + f}">${ic('down')}Prenesi</a>` : '<span class="muted">povezava še ni nastavljena</span>'}</div>`;
+  el.innerHTML = head('Prenesi aplikacijo', `Zadnja verzija${v ? ' <b>' + esc(v) + '</b>' : ''} — vsaka posodobitev se objavi samodejno`) + `<div class="card">${item('Trading Office Pro', 'Windows · prijava, črno-bel videz, tabele, lučke · priporočeno', 'Trading-Office-Pro-Setup.exe')}${item('Trading Office', 'Windows · klasičen videz s pixel pisarno', 'Trading-Office-Setup.exe')}</div>
+    <div class="card"><div class="cb"><b>Namestitev na nov računalnik</b><ol style="margin:8px 0 0 18px;padding:0;line-height:1.8;color:var(--muted)"><li>Prenesi in zaženi installer (Windows lahko opozori na neznanega izdajatelja → »Več informacij« → »Vseeno zaženi«).</li><li>V aplikaciji odpri <b>Nastavitve → Trading Office Web</b> in se prijavi s tem računom.</li><li>Klikni <b>»Prenesi podatke iz oblaka«</b> — dobiš vse agente in znanje.</li></ol>${repo ? `<p style="margin-top:12px"><a href="https://github.com/${repo}/releases" target="_blank" style="color:var(--muted)">Vse verzije in opombe</a></p>` : ''}</div></div>`;
+}
+function setP(el) {
+  el.innerHTML = head('Nastavitve', '') + `<div class="card"><div class="cb"><p><b>Prijavljen:</b> ${esc((SES && SES.email) || '')}</p><p><b>Projekt:</b> <span class="muted">${esc(CFG.url)}</span></p><p class="muted">Podatki: ${LIVE ? dt(LIVE.at) : '—'}${LIVE && LIVE.ver ? ' · aplikacija ' + esc(LIVE.ver) : ''}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn" id="dl">Prenesi celotne podatke (JSON)</button><button class="btn dan" id="lo">Odjava</button></div>
+    <p class="muted" style="font-size:12.5px;margin-top:16px">Namig: na telefonu odpri to stran v brskalniku in izberi »Dodaj na začetni zaslon« — deluje kot aplikacija.</p></div></div>`;
+  $('lo').onclick = () => { SES = null; LS.set('toWebSes', null); showLogin(); };
+  $('dl').onclick = async () => { $('dl').disabled = true; try { const F = await loadFull(); if (!F) return toast('V oblaku še ni celotnih podatkov'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(F.data)], { type: 'application/json' })); a.download = `trading-office-${new Date(F.updated_at).toISOString().slice(0, 10)}.json`; a.click(); } catch (e) { toast(e.message); } finally { $('dl').disabled = false; } };
+}
+
+if (CFG && SES && SES.ref) enter(); else showLogin();
+})();
+</script>
+</body>
+</html>
