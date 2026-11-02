@@ -116,6 +116,40 @@ td.n, th.n { text-align:right; } td.n { font-family:var(--mono); } td.w { white-
 .ph h1, .ch h3, .k small, .brand, form.lf h1, #mbox h2 { font-family:var(--disp); text-transform:uppercase; letter-spacing:.07em; } .ch h3 { font-size:12.5px; } .k small { font-size:10.5px; } .ph h1 { font-size:20px; }
 .fx-word { position:relative; display:inline-block; font:800 40px var(--disp); text-transform:uppercase; letter-spacing:.04em; line-height:1; margin:30px 0; }
 .fx-word::before, .fx-word::after { content:attr(data-t); position:absolute; left:0; color:transparent; -webkit-text-stroke:1px currentColor; opacity:.5; } .fx-word::before { top:-.62em; } .fx-word::after { top:.62em; }
+
+.star { border:0; background:none; color:var(--faint); font-size:16px; cursor:pointer; padding:0 2px; line-height:1; flex-shrink:0; } .star.on { color:#f5b301; } .star:hover { color:var(--text); }
+.srow { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:10px 0; border-bottom:1px solid var(--line); flex-wrap:wrap; } .srow:last-of-type { border-bottom:0; } .srow small { display:block; color:var(--muted); font-size:12.5px; }
+.seg { display:inline-flex; border:1px solid var(--line2); border-radius:6px; overflow:hidden; flex-wrap:wrap; } .seg button { border:0; border-right:1px solid var(--line2); background:var(--panel); color:var(--muted); padding:7px 12px; cursor:pointer; font-size:13px; } .seg button:last-child { border-right:0; } .seg button.on { background:var(--accent); color:var(--accent-fg,#fff); }
+.pal { display:flex; flex-wrap:wrap; gap:6px; } .pal button { display:inline-flex; align-items:center; gap:7px; padding:6px 10px 6px 6px; border:1px solid var(--line2); background:var(--panel); color:var(--text); border-radius:6px; cursor:pointer; font-size:12.5px; } .pal button i { width:18px; height:18px; border-radius:4px; } .pal button.on { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+:root { --accent2: var(--accent); }
+.fx body, html.fx body { background: radial-gradient(1200px 600px at 85% -10%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%), radial-gradient(900px 500px at -10% 110%, color-mix(in srgb, var(--accent2) 8%, transparent), transparent 60%), var(--bg); }
+html.fx .card, html.fx .k { border-color: color-mix(in srgb, var(--accent) 22%, var(--line)); clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px)); border-radius:0; }
+html.fx .k::after { height:2px; background: linear-gradient(90deg, var(--accent), var(--accent2), transparent 85%); }
+html.fx .ch { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 10%, transparent), transparent 60%); }
+html.fx .ni.act { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 28%, transparent), transparent); box-shadow: inset 3px 0 0 var(--accent); }
+html.fx .btn.pri, html.fx .bp { background: linear-gradient(90deg, var(--accent), var(--accent2)); border:0; color: var(--accent-fg,#000); }
+html.fx .mark { background: linear-gradient(135deg, var(--accent), var(--accent2)); color:#000; }
+html.fx .av { background: linear-gradient(135deg, var(--accent), var(--accent2)); color:#000; }
+html.fx th { background: color-mix(in srgb, var(--accent) 8%, var(--panel2)); }
+html.dense td { padding:6px 10px; } html.dense .ai { padding:7px 14px; } html.dense .fi { padding:6px 14px; }
+/* brez vodoravnega drsenja: vse se prelomi, nič ni odrezano */
+td, th { white-space:normal !important; overflow-wrap:anywhere; } .tw { overflow-x:visible; }
+.fi .t, .fi .w, .ai .nm b, .ai .nm small { white-space:normal !important; overflow:visible !important; text-overflow:clip !important; }
+.fi { flex-wrap:wrap; } .fi .t { flex:1 1 220px; }
+.k b { white-space:normal; overflow:visible; font-size:clamp(18px, 2.2vw, 24px); }
+@media (max-width: 820px) {
+  table.fit thead { display:none; } table.fit, table.fit tbody, table.fit tr, table.fit td { display:block; width:100%; }
+  table.fit tr { border-bottom:1px solid var(--line); padding:8px 14px; } table.fit tr:last-child { border-bottom:0; }
+  table.fit td { border:0 !important; padding:3px 0 !important; display:flex; justify-content:space-between; gap:12px; text-align:right !important; }
+  table.fit td[data-l]::before { content: attr(data-l); color:var(--muted); font-size:12px; text-align:left; flex-shrink:0; }
+  table.fit td:not([data-l]) { justify-content:flex-start; text-align:left !important; }
+  .kr { grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; } .k { padding:12px 14px; }
+  .al, .al[style] { grid-template-columns:1fr !important; } .ai { border-right:0; padding:11px 14px; }
+  .ai .rv { font-size:12px; } .ph h1 { font-size:18px; } .ch { padding:12px 14px; } .cb { padding:12px 14px; }
+  .fi time { width:auto; } .srow { flex-direction:column; align-items:flex-start; }
+  #mbox { padding:16px; } .stc { justify-content:flex-start; }
+  header { padding:0 10px; gap:6px; } #pc { font-size:11.5px; padding:0 8px; }
+}
 </style>
 </head>
 <body>
@@ -158,7 +192,7 @@ const $ = id => document.getElementById(id), esc = s => String(s ?? '').replace(
 const LS = { get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
 let CFG = (window.TO_CONFIG && window.TO_CONFIG.url) ? window.TO_CONFIG : LS.get('toWebCfg');
 let SES = LS.get('toWebSes'), LIVE = null, FULL = null, page = location.hash.slice(1) || 'dash', sortK = 'r', sortD = -1, q = '', kindF = 'all';
-const IC = { home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>', users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/>', activity: '<path d="M3 12h4l3-8 4 16 3-8h4"/>', brief: '<rect x="3" y="7" width="18" height="13" rx="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>', shield: '<path d="M12 3 4 6v6c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V6z"/>', flask: '<path d="M9 3h6"/><path d="M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/>', trash: '<path d="M4 7h16"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/>', gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>', sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', down: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>', moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>' };
+const IC = { chart: '<path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-7"/>', home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>', users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/>', activity: '<path d="M3 12h4l3-8 4 16 3-8h4"/>', brief: '<rect x="3" y="7" width="18" height="13" rx="1.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>', shield: '<path d="M12 3 4 6v6c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V6z"/>', flask: '<path d="M9 3h6"/><path d="M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/>', trash: '<path d="M4 7h16"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/>', gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>', sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', down: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>', moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>' };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${IC[n] || ''}</svg>`;
 const fR = v => { v = Math.round((+v || 0) * 100) / 100; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R'; }, pn = v => (+v > 0 ? 'pos' : +v < 0 ? 'neg' : '');
 const fE = v => (+v || 0).toLocaleString('sl-SI', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -205,7 +239,7 @@ setInterval(() => { if (!$('app').classList.contains('hidden') && !document.hidd
 $('rel').onclick = () => { load(); toast('Osveženo'); };
 
 // ---------- navigacija ----------
-const NAV = [['dash', 'Pregled', 'home'], ['dl', 'Prenesi aplikacijo', 'down'], ['agents', 'Agenti', 'users'], ['open', 'Odprti tradi', 'activity'], ['bots', 'Broker', 'brief'], ['ultron', 'Ultron', 'shield'], ['lab', 'Laboratorij', 'flask'], ['kos', 'Koš', 'trash'], ['set', 'Nastavitve', 'gear']];
+const NAV = [['dash', 'Pregled', 'home'], ['market', 'Trg v živo', 'chart'], ['agents', 'Agenti', 'users'], ['open', 'Odprti tradi', 'activity'], ['bots', 'Broker', 'brief'], ['ultron', 'Ultron', 'shield'], ['lab', 'Laboratorij', 'flask'], ['kos', 'Koš', 'trash'], ['dl', 'Prenesi aplikacijo', 'down'], ['set', 'Nastavitve', 'gear']];
 function nav() { const n = { agents: LIVE ? LIVE.agents.length : 0, open: LIVE ? LIVE.agents.filter(a => a.open.some(t => !t.pending)).length : 0, kos: LIVE ? LIVE.trash.length : 0, bots: LIVE ? LIVE.bots.length : 0 };
   $('nav').innerHTML = NAV.map(([k, l, i]) => `<div class="ni ${page === k ? 'act' : ''}" data-p="${k}">${ic(i)}${l}${n[k] ? `<b>${n[k]}</b>` : ''}</div>`).join(''); }
 $('nav').onclick = e => { const n = e.target.closest('[data-p]'); if (!n) return; page = n.dataset.p; location.hash = page; $('side').classList.remove('open'); render(); };
@@ -223,10 +257,10 @@ function render() {
   if (!LIVE) { el.innerHTML = head('Pregled', '') + `<div class="card"><div class="empty"><b>Ni podatkov iz računalnika</b>V aplikaciji Trading Office odpri Nastavitve → Trading Office Web in poveži oblak.</div></div>`; return; }
   const stale = Date.now() - LIVE.at > 120e3 ? `<div class="stale">Računalnik zadnjič poslal podatke ${ago(LIVE.at)} — je ugasnjen ali aplikacija ni odprta? Prikazano je zadnje znano stanje.</div>` : '';
   if (page === 'dl') return dlP(el);
-  ({ dash, agents, open: openP, bots: botsP, ultron, lab, kos, set: setP }[page] || dash)(el, stale);
+  ({ dash, market: marketP, agents, open: openP, bots: botsP, ultron, lab, kos, set: setP }[page] || dash)(el, stale);
 }
 const statusRank = { trade: 0, pend: 1, scan: 2, warn: 3, stop: 4, out: 5 };
-function agentItem(a) { const r = a.r + (a.openR || 0); return `<div class="ai" data-a="${a.id}"><div class="nm"><b>${esc(a.name)}</b><small>${esc(a.st.t)}</small></div><span class="rv ${pn(r)}">${fR(r)}</span>${lamp(a.st)}</div>`; }
+function agentItem(a) { const r = a.r + (a.openR || 0); return `<div class="ai" data-a="${a.id}">${starBtn(a.id)}<div class="nm"><b>${esc(a.name)}</b><small>${esc(a.st.t)}</small></div><span class="rv ${pn(r)}">${fR(r)}</span>${lamp(a.st)}</div>`; }
 function botSt(b) { return b.stopped ? { c: 'red', t: 'Ustavljen' } : b.paused ? { c: 'amber', t: 'Dnevna pavza' } : !b.enabled ? { c: 'gray', t: 'Izklopljen' } : b.mirror ? { c: 'green', t: `V tradu · ${b.mirror.side === 'buy' ? 'LONG' : 'SHORT'} ${b.mirror.sym || ''} ${b.mirror.agent ? '(' + b.mirror.agent + ')' : ''}` } : { c: 'blue', t: 'Teče · čaka na trade' }; }
 function botItem(b) { const s = botSt(b), tot = b.start != null ? b.eq - b.start : 0; return `<div class="ai"><div class="nm"><b>${esc(b.name)} <span class="muted" style="font-weight:400;font-size:11.5px">${b.kind === 'hl' ? 'Hyperliquid' : 'TradeLocker'}</span></b><small>${esc(s.t)}</small></div><span class="rv">${b.eq.toFixed(2)} $</span><span class="rv ${pn(b.day)}">${b.day >= 0 ? '+' : '−'}${Math.abs(b.day).toFixed(2)}</span><span class="rv ${pn(tot)}">${tot >= 0 ? '+' : '−'}${Math.abs(tot).toFixed(2)}</span>${lamp(s)}</div>`; }
 function bindAgents(el) { el.querySelectorAll('[data-a]').forEach(n => n.onclick = e => { if (e.target.closest('button')) return; detail(n.dataset.a); }); }
@@ -256,7 +290,7 @@ function agents(el, stale) {
   L.sort((x, y) => { const a = v(x, sortK), b = v(y, sortK); return (a > b ? 1 : a < b ? -1 : 0) * sortD; });
   el.innerHTML = head('Agenti', 'Lučka na koncu vrstice kaže trenutno stanje') + stale + `<div class="card"><div class="tools"><select id="kf"><option value="all">Vse generacije</option><option value="g0">Izvirniki (G0)</option><option value="kl">Kloni</option></select><span class="grow"></span><input class="q" id="q" placeholder="Išči po imenu ali instrumentu …" value="${esc(q)}"></div>
     <div class="tw"><table><thead><tr><th>#</th>${COLS.map(c => `<th class="s ${c[2] || ''}" data-s="${c[0]}">${c[1]}${sortK === c[0] ? (sortD > 0 ? ' ▲' : ' ▼') : ''}</th>`).join('')}<th class="s n" data-s="st">Stanje</th></tr></thead><tbody>
-    ${L.map((a, i) => `<tr data-a="${a.id}"><td class="muted">${i + 1}</td><td><span class="nm-l">${esc(a.name)}</span><span class="sub">${esc(a.instr.join(', '))}${a.tf ? ' · ' + esc(a.tf) : ''}</span></td><td><span class="b">${a.gen ? 'G' + a.gen + ' · klon' : 'G0 · izvirnik'}</span></td><td class="n">${a.bal != null ? fE(a.bal) : '—'}</td><td class="n ${pn(a.r + a.openR)}">${fR(a.r + a.openR)}</td><td class="n">${a.n}</td><td class="n">${a.wr == null ? '—' : Math.round(a.wr * 100) + ' %'}</td><td class="muted">${ago(a.last)}</td>
+    ${L.map((a, i) => `<tr data-a="${a.id}"><td class="muted">${i + 1}</td><td>${starBtn(a.id)} <span class="nm-l">${esc(a.name)}</span><span class="sub">${esc(a.instr.join(', '))}${a.tf ? ' · ' + esc(a.tf) : ''}</span></td><td><span class="b">${a.gen ? 'G' + a.gen + ' · klon' : 'G0 · izvirnik'}</span></td><td class="n">${a.bal != null ? fE(a.bal) : '—'}</td><td class="n ${pn(a.r + a.openR)}">${fR(a.r + a.openR)}</td><td class="n">${a.n}</td><td class="n">${a.wr == null ? '—' : Math.round(a.wr * 100) + ' %'}</td><td class="muted">${ago(a.last)}</td>
       <td><div class="stc"><span>${esc(a.st.t)}</span>${lamp(a.st)}</div></td></tr>`).join('') || '<tr><td colspan="10"><div class="empty">Ni agentov</div></td></tr>'}</tbody></table></div></div>`;
   $('kf').value = kindF; $('kf').onchange = e => { kindF = e.target.value; render(); };
   $('q').oninput = e => { q = e.target.value; const p = e.target.selectionStart; render(); $('q').focus(); $('q').setSelectionRange(p, p); };
@@ -271,7 +305,7 @@ function act(c, id) {
 function detail(id) {
   const a = LIVE.agents.find(x => x.id === id); if (!a) return;
   const T = a.trades.slice().reverse();
-  $('mbox').innerHTML = `<div style="display:flex;align-items:center;gap:10px">${lamp(a.st)}<h2>${esc(a.name)}</h2><span class="b">${a.gen ? 'G' + a.gen + ' · klon' : 'G0 · izvirnik'}</span></div><p class="muted" style="margin:4px 0 16px">${esc(a.st.t)} · ${esc(a.instr.join(', '))}${a.floor ? ' · ' + esc(a.floor) : ''}${a.sp ? ` · ${a.lessons} lekcij${a.frozen ? ' · zamrznjen' : ''}` : ' · ' + esc(a.tactics.join(' + '))}</p>
+  $('mbox').innerHTML = `<div style="display:flex;align-items:center;gap:10px">${lamp(a.st)}<h2>${esc(a.name)}</h2>${starBtn(a.id)}<span class="b">${a.gen ? 'G' + a.gen + ' · klon' : 'G0 · izvirnik'}</span></div><p class="muted" style="margin:4px 0 16px">${esc(a.st.t)} · ${esc(a.instr.join(', '))}${a.floor ? ' · ' + esc(a.floor) : ''}${a.sp ? ` · ${a.lessons} lekcij${a.frozen ? ' · zamrznjen' : ''}` : ' · ' + esc(a.tactics.join(' + '))}</p>
     <div class="kr" style="margin-bottom:14px"><div class="k"><small>Račun</small><b>${a.bal != null ? fE(a.bal) : '—'}</b><span>začetek ${a.start != null ? fE(a.start) : '—'}</span></div><div class="k"><small>Skupaj R</small><b class="${pn(a.r)}">${fR(a.r)}</b><span>${a.n} tradov</span></div><div class="k"><small>Win %</small><b>${a.wr == null ? '—' : Math.round(a.wr * 100) + ' %'}</b><span>zadnji ${ago(a.last)}</span></div><div class="k"><small>Odprto</small><b class="${pn(a.openR)}">${a.open.length ? fR(a.openR) : '—'}</b><span>${a.open.length} odprtih</span></div></div>
     <div class="card" style="margin:0 0 14px"><div class="ch"><h3>Zadnji tradi<small>${T.length}</small></h3></div><div class="tw" style="max-height:320px;overflow:auto"><table><thead><tr><th>Čas</th><th>Instrument</th><th>Smer</th><th class="n">Vstop</th><th class="n">Izhod</th><th class="n">R</th><th>Razlog</th></tr></thead><tbody>${T.map(t => `<tr><td class="muted">${dt(t.time)}</td><td>${esc(t.instr)} <span class="muted">${esc(t.tf || '')}</span></td><td><span class="b ${t.dir === 1 ? 'g' : 'r'}">${t.dir === 1 ? 'LONG' : 'SHORT'}</span></td><td class="n">${t.entry ?? '—'}</td><td class="n">${t.exit ?? '—'}</td><td class="n ${pn(t.r)}">${t.r == null ? '—' : fR(t.r)}</td><td class="w muted">${esc(t.why)}</td></tr>`).join('') || '<tr><td colspan="7"><div class="empty">Ni tradov</div></td></tr>'}</tbody></table></div></div>
     ${(a.log || []).length ? `<div class="card" style="margin:0"><div class="ch"><h3>Dnevnik</h3></div>${a.log.slice().reverse().map(l => `<div class="fi"><time>${dt(l.t)}</time><span class="t" style="white-space:normal">${esc(l.txt)}</span></div>`).join('')}</div>` : ''}
@@ -304,9 +338,27 @@ function dlP(el) {
   if ($('inst')) $('inst').onclick = async () => { instEvt.prompt(); await instEvt.userChoice; instEvt = null; render(); };
 }
 function setP(el) {
-  el.innerHTML = head('Nastavitve', '') + `<div class="card"><div class="cb"><p><b>Prijavljen:</b> ${esc((SES && SES.email) || '')}</p><p><b>Projekt:</b> <span class="muted">${esc(CFG.url)}</span></p><p class="muted">Podatki: ${LIVE ? dt(LIVE.at) : '—'}${LIVE && LIVE.ver ? ' · aplikacija ' + esc(LIVE.ver) : ''}</p>
+  const seg = (k, opts) => `<div class="seg">${opts.map(([v, l]) => `<button data-look="${k}" data-v="${v}" class="${String(LOOK[k]) === String(v) ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+  const perm = 'Notification' in window ? Notification.permission : 'ni podprto';
+  el.innerHTML = head('Nastavitve', 'Videz te strani, obvestila in račun') + `<div class="card"><div class="ch"><h3>Videz</h3></div><div class="cb">
+    <div class="srow"><div><b>Barvna tema</b><small>enake teme kot v aplikaciji</small></div><div class="pal">${Object.entries(PAL).map(([k, v]) => `<button data-pal="${k}" class="${LOOK.pal === k ? 'on' : ''}"><i style="background:${v[1] ? `linear-gradient(135deg,${v[1][9]},${v[1][10]})` : 'linear-gradient(135deg,#000 50%,#fff 50%)'}"></i>${v[0]}</button>`).join('')}</div></div>
+    ${LOOK.pal === 'mono' ? `<div class="srow"><div><b>Svetla / temna</b><small>za črno-belo temo</small></div><div class="seg"><button data-dk="0" class="${document.documentElement.classList.contains('dark') ? '' : 'on'}">Svetla</button><button data-dk="1" class="${document.documentElement.classList.contains('dark') ? 'on' : ''}">Temna</button></div></div>` : ''}
+    <div class="srow"><div><b>Velikost pisave</b></div>${seg('fs', [[13, 'S'], [14, 'M'], [15, 'L'], [16, 'XL']])}</div>
+    <div class="srow"><div><b>Gostota</b><small>razmik v tabelah in seznamih</small></div>${seg('dense', [[false, 'Običajno'], [true, 'Kompaktno']])}</div></div></div>
+    <div class="card"><div class="ch"><h3>Obvestila</h3></div><div class="cb">
+    <div class="srow"><div><b>Obvestila za označene agente</b><small>označiš jih z ☆ ob imenu · dovoljenje brskalnika: ${esc(perm)}</small></div><div class="seg"><button id="nf-on" class="${NOTIF.on ? 'on' : ''}">Vklopljeno</button><button id="nf-off" class="${NOTIF.on ? '' : 'on'}">Izklopljeno</button></div></div>
+    <div class="srow"><div><b>Kdaj</b></div><div class="seg">${[['open', 'nov trade'], ['close', 'zaprt trade'], ['warn', 'opozorilo']].map(([k, l]) => `<button data-nf="${k}" class="${NOTIF[k] ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+    <div class="srow"><div><b>Označeni agenti</b><small>${[...STAR].map(id => (LIVE && LIVE.agents.find(a => a.id === id) || {}).name).filter(Boolean).map(esc).join(', ') || 'še nobeden'}</small></div><button class="btn sm" id="nf-test">Pošlji testno obvestilo</button></div>
+    <p class="muted" style="font-size:12.5px;margin:10px 0 0">Obvestila pridejo, ko je ta stran odprta (lahko v ozadju) ali nameščena na začetnem zaslonu in odprta. Na iPhonu stran najprej dodaj na začetni zaslon (iOS 16.4 ali novejši).</p></div></div>` + `<div class="card"><div class="cb"><p><b>Prijavljen:</b> ${esc((SES && SES.email) || '')}</p><p><b>Projekt:</b> <span class="muted">${esc(CFG.url)}</span></p><p class="muted">Podatki: ${LIVE ? dt(LIVE.at) : '—'}${LIVE && LIVE.ver ? ' · aplikacija ' + esc(LIVE.ver) : ''}</p>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn" id="dl">Prenesi celotne podatke (JSON)</button><button class="btn dan" id="lo">Odjava</button></div>
     <p class="muted" style="font-size:12.5px;margin-top:16px">Namig: na telefonu odpri to stran v brskalniku in izberi »Dodaj na začetni zaslon« — deluje kot aplikacija.</p></div></div>`;
+  el.querySelectorAll('[data-pal]').forEach(b => b.onclick = () => { LOOK.pal = b.dataset.pal; LS.set('toWebLook', LOOK); applyLook(); render(); });
+  el.querySelectorAll('[data-dk]').forEach(b => b.onclick = () => { LS.set('toWebDark', b.dataset.dk === '1'); applyLook(); render(); });
+  el.querySelectorAll('[data-look]').forEach(b => b.onclick = () => { const k = b.dataset.look, v = b.dataset.v; LOOK[k] = v === 'true' ? true : v === 'false' ? false : +v; LS.set('toWebLook', LOOK); applyLook(); render(); });
+  $('nf-on').onclick = async () => { if (!('Notification' in window)) return toast('Ta brskalnik ne podpira obvestil'); const p = await Notification.requestPermission(); if (p !== 'granted') return toast('Obvestila niso dovoljena v brskalniku'); NOTIF.on = true; LS.set('toWebNotif', NOTIF); render(); notify('Trading Office', 'Obvestila so vklopljena'); };
+  $('nf-off').onclick = () => { NOTIF.on = false; LS.set('toWebNotif', NOTIF); render(); };
+  el.querySelectorAll('[data-nf]').forEach(b => b.onclick = () => { NOTIF[b.dataset.nf] = !NOTIF[b.dataset.nf]; LS.set('toWebNotif', NOTIF); render(); });
+  $('nf-test').onclick = () => { if (!NOTIF.on) return toast('Najprej vklopi obvestila'); notify('Trading Office', 'Testno obvestilo — deluje'); };
   $('lo').onclick = () => { SES = null; LS.set('toWebSes', null); showLogin(); };
   $('dl').onclick = async () => { $('dl').disabled = true; try { const F = await loadFull(); if (!F) return toast('V oblaku še ni celotnih podatkov'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(F.data)], { type: 'application/json' })); a.download = `trading-office-${new Date(F.updated_at).toISOString().slice(0, 10)}.json`; a.click(); } catch (e) { toast(e.message); } finally { $('dl').disabled = false; } };
 }
@@ -314,6 +366,65 @@ function setP(el) {
 // povezava iz potrditvenega maila: #access_token=...&refresh_token=...
 (() => { const h = new URLSearchParams(location.hash.slice(1)); if (h.get('access_token') && h.get('refresh_token')) { SES = { tok: h.get('access_token'), ref: h.get('refresh_token'), exp: Date.now() + (+h.get('expires_in') || 3600) * 1000 - 60e3, email: '' }; LS.set('toWebSes', SES); history.replaceState(null, '', location.pathname); page = 'dash'; setTimeout(() => toast('E-pošta potrjena — dobrodošel'), 300); }
   else if (h.get('error_description')) setTimeout(() => { $('l-err').textContent = 'Povezava ni veljavna ali je potekla — prijavi se ali ustvari račun znova'; }, 100); })();
+// ================= 1.13.1 — prilagoditev videza, trg v živo, obvestila za označene agente, brez vodoravnega drsenja =================
+const PAL = { mono: ['Črno-bela', null], neon: ['Neon', ['#07060d', '#0e0c19', '#141126', '#1b1733', '#2a2342', '#3a3060', '#efeaff', '#a59cd0', '#6c6494', '#a855f7', '#22d3ee']], cyber: ['Cyber', ['#03080c', '#081219', '#0c1a24', '#11222f', '#123345', '#1b4b63', '#e6fbff', '#86b3c4', '#4b7385', '#00e5ff', '#ff2bd6']], matrix: ['Matrix', ['#020604', '#061009', '#09170d', '#0d2013', '#11331d', '#1a4d2b', '#dcffe8', '#7fbf95', '#4a7a5a', '#22ff88', '#a3ff12']], sunset: ['Sunset', ['#0c0608', '#160b0f', '#1e0f15', '#28141c', '#3a1a26', '#542538', '#fff0f3', '#d39aa9', '#8a5a67', '#ff6b3d', '#ff2e88']], ocean: ['Ocean', ['#040912', '#09121f', '#0d1a2b', '#122238', '#1a2c48', '#25406a', '#e8f1ff', '#8fa8cc', '#566d8f', '#3b82f6', '#14b8a6']], ultron: ['Ultron', ['#0a0404', '#140808', '#1c0c0c', '#261010', '#3a1515', '#5a2020', '#fff1ec', '#cf9a90', '#86594f', '#ff3b3b', '#ffb020']], arctic: ['Arctic', ['#eef4fb', '#ffffff', '#f5f9fe', '#e8f0fa', '#d6e2f0', '#bcd0e6', '#0b1726', '#5a6f88', '#93a5bb', '#2563eb', '#06b6d4']] };
+const LOOK = Object.assign({ pal: 'neon', fs: 14, dense: false }, LS.get('toWebLook') || {});
+function applyLook() {
+  const r = document.documentElement, P = PAL[LOOK.pal] || PAL.mono, keys = ['--bg', '--panel', '--panel2', '--panel3', '--line', '--line2', '--text', '--muted', '--faint', '--accent', '--accent2'];
+  keys.forEach(k => r.style.removeProperty(k)); r.classList.toggle('fx', !!P[1]);
+  if (P[1]) { keys.forEach((k, i) => r.style.setProperty(k, P[1][i])); r.classList.toggle('dark', LOOK.pal !== 'arctic'); r.style.setProperty('--accent-fg', LOOK.pal === 'arctic' ? '#fff' : '#000'); }
+  else { theme(); r.style.removeProperty('--accent-fg'); }
+  r.style.fontSize = (LOOK.fs || 14) + 'px'; document.body.style.fontSize = (LOOK.fs || 14) + 'px'; r.classList.toggle('dense', !!LOOK.dense);
+  $('theme').innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.5-.8 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-7.8-9-7.8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>';
+  $('theme').title = 'Tema: ' + (PAL[LOOK.pal] || PAL.mono)[0];
+}
+$('theme').onclick = () => { const K = Object.keys(PAL); if (LOOK.pal === 'mono' && !document.documentElement.classList.contains('dark')) { LS.set('toWebDark', true); } else { LOOK.pal = K[(K.indexOf(LOOK.pal) + 1) % K.length]; if (LOOK.pal === 'mono') LS.set('toWebDark', false); } LS.set('toWebLook', LOOK); applyLook(); toast('Tema: ' + PAL[LOOK.pal][0]); if (page === 'set') render(); };
+applyLook();
+
+// ---------- označeni agenti in obvestila ----------
+let STAR = new Set(LS.get('toWebStar') || []), NOTIF = Object.assign({ on: false, open: true, close: true, warn: true }, LS.get('toWebNotif') || {}), PREV = null;
+const starBtn = id => `<button class="star ${STAR.has(id) ? 'on' : ''}" data-star="${id}" title="Označi za obvestila">${STAR.has(id) ? '★' : '☆'}</button>`;
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-star]'); if (!b) return; e.stopPropagation(); const id = b.dataset.star; STAR.has(id) ? STAR.delete(id) : STAR.add(id); LS.set('toWebStar', [...STAR]); document.querySelectorAll(`[data-star="${id}"]`).forEach(x => { x.classList.toggle('on', STAR.has(id)); x.textContent = STAR.has(id) ? '★' : '☆'; }); if (STAR.has(id) && !NOTIF.on) toast('Agent označen — obvestila vklopiš v Nastavitvah'); }, true);
+async function notify(title, body) {
+  if (!NOTIF.on || !('Notification' in window) || Notification.permission !== 'granted') return;
+  try { const reg = navigator.serviceWorker && await navigator.serviceWorker.getRegistration(); if (reg) return reg.showNotification(title, { body, icon: 'icon-192.png', badge: 'icon-192.png', tag: title + body }); new Notification(title, { body, icon: 'icon-192.png' }); } catch {}
+}
+function checkNotify(prev, cur) {
+  if (!prev || !cur) return; const P = new Map(prev.agents.map(a => [a.id, a]));
+  for (const a of cur.agents) { if (!STAR.has(a.id)) continue; const o = P.get(a.id); if (!o) continue;
+    const ol = o.open.filter(t => !t.pending).length, nl = a.open.filter(t => !t.pending).length;
+    if (NOTIF.open && nl > ol) { const t = a.open.filter(x => !x.pending)[0]; notify(`${a.name}: nov trade`, `${t.dir === 1 ? 'LONG' : 'SHORT'} ${t.instr} @ ${t.entry} · SL ${t.sl} · TP ${t.tp ?? '—'}`); }
+    const lt = a.trades.at(-1), ot = o.trades.at(-1); if (NOTIF.close && lt && (!ot || lt.time > ot.time)) notify(`${a.name}: trade zaprt ${fR(lt.r)}`, `${lt.dir === 1 ? 'LONG' : 'SHORT'} ${lt.instr} · ${lt.why || ''} · skupaj ${fR(a.r)}`);
+    if (NOTIF.warn && a.st.c === 'orange' && o.st.c !== 'orange') notify(`${a.name}: opozorilo`, a.st.t);
+  }
+}
+(() => { const o = load; load = async function () { const prev = LIVE; await o.apply(this, arguments); if (prev && LIVE && LIVE.at !== prev.at) checkNotify(prev, LIVE); }; })();
+
+// ---------- trg v živo ----------
+function candleSvg(K, lines, w = 1000, h = 340) {
+  if (!K || K.length < 5) return '<div class="empty">Ni sveč — aplikacija na računalniku še ni poslala podatkov o trgu.</div>';
+  const pad = 8, lo = Math.min(...K.map(b => b[3]), ...lines.map(l => l.p)), hi = Math.max(...K.map(b => b[2]), ...lines.map(l => l.p)), bw = (w - 70) / K.length, y = v => pad + (hi - v) * (h - 2 * pad) / ((hi - lo) || 1);
+  const dec = hi > 1000 ? 1 : hi > 10 ? 2 : 4, grid = [0, .25, .5, .75, 1].map(f => lo + (hi - lo) * f);
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:auto;aspect-ratio:${w}/${h};display:block">${grid.map(g => `<line x1="0" x2="${w - 66}" y1="${y(g)}" y2="${y(g)}" stroke="var(--line)" stroke-width="1"/><text x="${w - 62}" y="${y(g) + 4}" fill="var(--muted)" font-size="12">${g.toFixed(dec)}</text>`).join('')}
+    ${K.map((b, i) => { const x = i * bw + bw / 2, up = b[4] >= b[1], c = up ? 'var(--green)' : 'var(--red)'; return `<line x1="${x}" x2="${x}" y1="${y(b[2])}" y2="${y(b[3])}" stroke="${c}" stroke-width="1"/><rect x="${x - bw * 0.35}" y="${y(Math.max(b[1], b[4]))}" width="${bw * 0.7}" height="${Math.max(1, Math.abs(y(b[1]) - y(b[4])))}" fill="${c}"/>`; }).join('')}
+    ${lines.map(l => `<line x1="0" x2="${w - 66}" y1="${y(l.p)}" y2="${y(l.p)}" stroke="${l.c}" stroke-width="1.5" stroke-dasharray="6 4"/><text x="4" y="${y(l.p) - 4}" fill="${l.c}" font-size="12">${esc(l.t)}</text>`).join('')}</svg>`;
+}
+function marketP(el, stale) {
+  const M = LIVE.market || {}, tr = t => t === 'up' ? '<span class="pos">▲ gor</span>' : t === 'down' ? '<span class="neg">▼ dol</span>' : t ? '<span class="muted">— ' + esc(t === 'flat' ? 'brez smeri' : t) + '</span>' : '<span class="muted">—</span>';
+  const K = M.k || [], last = K.at(-1), first = K[0], ch = last && first ? (last[4] - first[1]) / first[1] * 100 : null;
+  const lines = LIVE.agents.flatMap(a => a.open.filter(t => t.instr === M.focus).flatMap(t => [{ p: t.entry, c: 'var(--accent)', t: `${a.name} ${t.dir === 1 ? 'LONG' : 'SHORT'}` }, { p: t.sl, c: 'var(--red)', t: 'SL ' + a.name }, ...(t.tp != null ? [{ p: t.tp, c: 'var(--green)', t: 'TP ' + a.name }] : [])]));
+  el.innerHTML = head('Trg v živo', `${esc(M.focus || '')} · 5-minutne sveče · osveži se vsakih 15 s`) + stale +
+    `<div class="kr">${(M.list || []).slice(0, 6).map(x => `<div class="k"><small>${esc(x.i)}</small><b>${x.px != null ? (+x.px).toLocaleString('sl-SI', { maximumFractionDigits: x.px > 1000 ? 1 : x.px > 10 ? 2 : 4 }) : '—'}</b><span>5m ${tr(x.t5)} · 15m ${tr(x.t15)}</span></div>`).join('')}</div>
+    <div class="card"><div class="ch"><h3>${esc(M.focus || 'Graf')}<small>${last ? 'zadnja ' + (+last[4]).toLocaleString('sl-SI') + (ch != null ? ` · ${ch >= 0 ? '+' : ''}${ch.toFixed(2)} % v ${K.length} svečah` : '') : ''}</small></h3><span class="muted" style="font-size:12px">${lines.length ? 'črte: vstop, SL in TP odprtih tradov' : 'ni odprtih tradov na tem instrumentu'}</span></div><div class="cb">${innerWidth < 820 ? candleSvg(K.slice(-60), lines, 600, 460) : candleSvg(K, lines)}</div></div>
+    <div class="card"><div class="ch"><h3>Instrumenti</h3></div><div class="tw"><table><thead><tr><th>Instrument</th><th class="n">Cena</th><th>Trend 5m</th><th>Trend 15m</th><th>Trend 1h</th><th>Agenti v tradu</th></tr></thead><tbody>${(M.list || []).map(x => `<tr><td><b style="font-weight:600">${esc(x.i)}</b></td><td class="n">${x.px != null ? (+x.px).toLocaleString('sl-SI', { maximumFractionDigits: x.px > 1000 ? 1 : x.px > 10 ? 2 : 4 }) : '—'}</td><td>${tr(x.t5)}</td><td>${tr(x.t15)}</td><td>${tr(x.t1h)}</td><td>${LIVE.agents.filter(a => a.open.some(t => t.instr === x.i && !t.pending)).map(a => esc(a.name)).join(', ') || '<span class="muted">—</span>'}</td></tr>`).join('') || '<tr><td colspan="6"><div class="empty">Ni podatkov o trgu</div></td></tr>'}</tbody></table></div></div>`;
+}
+
+// ---------- brez vodoravnega drsenja: oznake celic (na telefonu tabela postane kartice) ----------
+function fitTables(root) {
+  (root || document).querySelectorAll('table').forEach(t => { const H = [...t.querySelectorAll('thead th')].map(th => th.textContent.replace(/[▲▼]/g, '').trim()); t.querySelectorAll('tbody tr').forEach(tr => [...tr.children].forEach((td, i) => { if (H[i] && !td.hasAttribute('colspan')) td.dataset.l = H[i]; })); t.classList.add('fit'); });
+}
+new MutationObserver(() => { fitTables($('page')); fitTables($('mbox')); }).observe(document.body, { childList: true, subtree: true });
+
 if (CFG && SES && SES.ref) enter(); else showLogin();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 let instEvt = null; window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); instEvt = e; });
