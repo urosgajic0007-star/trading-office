@@ -239,7 +239,7 @@ setInterval(() => { if (!$('app').classList.contains('hidden') && !document.hidd
 $('rel').onclick = () => { load(); toast('Osveženo'); };
 
 // ---------- navigacija ----------
-const NAV = [['dash', 'Pregled', 'home'], ['market', 'Trg v živo', 'chart'], ['agents', 'Agenti', 'users'], ['open', 'Odprti tradi', 'activity'], ['bots', 'Broker', 'brief'], ['ultron', 'Ultron', 'shield'], ['lab', 'Laboratorij', 'flask'], ['kos', 'Koš', 'trash'], ['dl', 'Prenesi aplikacijo', 'down'], ['set', 'Nastavitve', 'gear']];
+const NAV = [['dash', 'Pregled', 'home'], ['market', 'Trg v živo', 'chart'], ['agents', 'Agenti', 'users'], ['daily', 'Dnevni R', 'chart'], ['open', 'Odprti tradi', 'activity'], ['bots', 'Broker', 'brief'], ['ultron', 'Ultron', 'shield'], ['lab', 'Laboratorij', 'flask'], ['kos', 'Koš', 'trash'], ['dl', 'Prenesi aplikacijo', 'down'], ['set', 'Nastavitve', 'gear']];
 function nav() { const n = { agents: LIVE ? LIVE.agents.length : 0, open: LIVE ? LIVE.agents.filter(a => a.open.some(t => !t.pending)).length : 0, kos: LIVE ? LIVE.trash.length : 0, bots: LIVE ? LIVE.bots.length : 0 };
   $('nav').innerHTML = NAV.map(([k, l, i]) => `<div class="ni ${page === k ? 'act' : ''}" data-p="${k}">${ic(i)}${l}${n[k] ? `<b>${n[k]}</b>` : ''}</div>`).join(''); }
 $('nav').onclick = e => { const n = e.target.closest('[data-p]'); if (!n) return; page = n.dataset.p; location.hash = page; $('side').classList.remove('open'); render(); };
@@ -257,7 +257,7 @@ function render() {
   if (!LIVE) { el.innerHTML = head('Pregled', '') + `<div class="card"><div class="empty"><b>Ni podatkov iz računalnika</b>V aplikaciji Trading Office odpri Nastavitve → Trading Office Web in poveži oblak.</div></div>`; return; }
   const stale = Date.now() - LIVE.at > 120e3 ? `<div class="stale">Računalnik zadnjič poslal podatke ${ago(LIVE.at)} — je ugasnjen ali aplikacija ni odprta? Prikazano je zadnje znano stanje.</div>` : '';
   if (page === 'dl') return dlP(el);
-  ({ dash, market: marketP, agents, open: openP, bots: botsP, ultron, lab, kos, set: setP }[page] || dash)(el, stale);
+  ({ dash, market: marketP, agents, daily: dailyP, open: openP, bots: botsP, ultron, lab, kos, set: setP }[page] || dash)(el, stale);
 }
 const statusRank = { trade: 0, pend: 1, scan: 2, warn: 3, stop: 4, out: 5 };
 function agentItem(a) { const inT = a.open.some(t => !t.pending), v = inT ? (a.openR || 0) : a.r; return `<div class="ai" data-a="${a.id}">${starBtn(a.id)}<div class="nm"><b>${esc(a.name)}</b><small>${esc(a.st.t)} · skupaj ${fR(a.r)}</small></div><span class="rv ${pn(v)}" title="${inT ? 'odprti trade zdaj' : 'skupaj'}">${fR(v)}</span>${lamp(a.st)}</div>`; }
@@ -302,11 +302,28 @@ function act(c, id) {
   const L = { clone: `Kloniram agenta ${a.name}? Klon dobi enako znanje in taktike, nov račun.`, delete: `Izbrišem agenta ${a.name}? Gre v koš na računalniku (30 dni ga lahko vrneš).`, pause: `Ustavim agenta ${a.name}? Ne bo odpiral novih tradov.`, resume: `Zaženem agenta ${a.name}?` };
   if (!confirm(L[c])) return; cmd({ type: c, id }, ({ clone: 'Kloniranje', delete: 'Brisanje', pause: 'Ustavitev', resume: 'Zagon' })[c]);
 }
+
+// ---------- Dnevni R (lestvica po povprečju + stolpci po dnevih) ----------
+const dKey = t => { const d = new Date(t); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+function dDaily(a, days) { const from = Date.now() - days * 864e5, M = {}; if (a.daily) { for (const [k, v] of Object.entries(a.daily)) if (new Date(k).getTime() >= from - 864e5) M[k] = v; return M; } for (const t of a.trades || []) { if (t.r == null || !t.time || t.time < from) continue; const k = dKey(t.time); M[k] = (M[k] || 0) + t.r; } return M; }
+let DD = 30;
+function dCols(M, days) { const K = []; for (let i = days - 1; i >= 0; i--) { const d = new Date(Date.now() - i * 864e5); if (d.getDay() % 6) K.push(dKey(d)); } const mx = Math.max(0.5, ...K.map(k => Math.abs(M[k] || 0)));
+  return `<div style="display:flex;gap:2px;align-items:stretch;overflow-x:auto;padding:4px 0">${K.map(k => { const v = M[k], h = v == null ? 0 : Math.abs(v) / mx * 50; return `<div style="flex:1;min-width:9px;display:flex;flex-direction:column;align-items:center" title="${k}: ${v == null ? 'brez tradov' : fR(v)}"><div style="position:relative;width:100%;height:120px"><span style="position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line)"></span>${v == null ? '' : `<i style="position:absolute;left:12%;right:12%;${v >= 0 ? 'bottom:50%' : 'top:50%'};height:${h}%;border-radius:2px;background:${v >= 0 ? 'var(--green,#22c55e)' : 'var(--red,#ef4444)'}"></i>`}</div><small style="font-size:9px;color:var(--muted)">${+k.slice(8)}.</small></div>`; }).join('')}</div>`; }
+function dailyP(el, stale) {
+  const L = LIVE.agents.map(a => { const M = dDaily(a, DD), v = Object.values(M), sum = v.reduce((x, y) => x + y, 0); return { a, M, n: v.length, sum, avg: v.length ? sum / v.length : null, pos: v.filter(x => x > 0).length }; }).filter(r => r.n).sort((x, y) => y.avg - x.avg);
+  const mx = Math.max(0.01, ...L.map(r => Math.abs(r.avg)));
+  el.innerHTML = stale + head('Dnevni R', 'Povprečni R na dan (samo dnevi s tradi) — najboljši zgoraj. Klikni agenta za njegove dneve.') +
+    `<div style="display:flex;gap:6px;margin-bottom:12px">${[7, 14, 30].map(n => `<button class="btn ${DD === n ? 'pri' : ''}" data-dd="${n}">${n} dni</button>`).join('')}</div>
+    <div class="card">${L.map((r, i) => `<div data-dg="${r.a.id}" style="display:grid;grid-template-columns:22px minmax(70px,120px) 1fr 62px;gap:8px;align-items:center;padding:6px 4px;cursor:pointer;border-bottom:1px solid var(--line)"><small class="muted">${i + 1}.</small><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.a.name)}</span><div style="position:relative;height:14px"><span style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)"></span><i style="position:absolute;top:2px;bottom:2px;border-radius:3px;${r.avg >= 0 ? 'left:50%' : 'right:50%'};width:${Math.abs(r.avg) / mx * 50}%;background:${r.avg >= 0 ? 'var(--green,#22c55e)' : 'var(--red,#ef4444)'}"></i></div><b class="${pn(r.avg)}" style="text-align:right">${fR(r.avg)}</b></div>`).join('') || '<div class="empty">V tem obdobju ni tradov</div>'}</div>`;
+  el.querySelectorAll('[data-dd]').forEach(b => b.onclick = () => { DD = +b.dataset.dd; render(); });
+  el.querySelectorAll('[data-dg]').forEach(b => b.onclick = () => detail(b.dataset.dg));
+}
 function detail(id) {
   const a = LIVE.agents.find(x => x.id === id); if (!a) return;
   const T = a.trades.slice().reverse();
   $('mbox').innerHTML = `<div style="display:flex;align-items:center;gap:10px">${lamp(a.st)}<h2>${esc(a.name)}</h2>${starBtn(a.id)}<span class="b">${a.gen ? 'G' + a.gen + ' · klon' : 'G0 · izvirnik'}</span></div><p class="muted" style="margin:4px 0 16px">${esc(a.st.t)} · ${esc(a.instr.join(', '))}${a.floor ? ' · ' + esc(a.floor) : ''}${a.sp ? ` · ${a.lessons} lekcij${a.frozen ? ' · zamrznjen' : ''}` : ' · ' + esc(a.tactics.join(' + '))}</p>
     <div class="kr" style="margin-bottom:14px"><div class="k"><small>Račun</small><b>${a.bal != null ? fE(a.bal) : '—'}</b><span>začetek ${a.start != null ? fE(a.start) : '—'}</span></div><div class="k"><small>Skupaj R</small><b class="${pn(a.r)}">${fR(a.r)}</b><span>${a.n} tradov</span></div><div class="k"><small>Win %</small><b>${a.wr == null ? '—' : Math.round(a.wr * 100) + ' %'}</b><span>zadnji ${ago(a.last)}</span></div><div class="k"><small>Odprto</small><b class="${pn(a.openR)}">${a.open.length ? fR(a.openR) : '—'}</b><span>${a.open.length} odprtih</span></div></div>
+    ${(() => { const M = dDaily(a, 30), v = Object.values(M); return `<div class="card" style="margin:0 0 14px"><div class="ch"><h3>Dnevni R<small>zadnjih 30 dni · povprečje ${v.length ? fR(v.reduce((x, y) => x + y, 0) / v.length) : '—'} na dan</small></h3></div><div style="padding:0 12px 10px">${dCols(M, 30)}</div></div>`; })()}
     <div class="card" style="margin:0 0 14px"><div class="ch"><h3>Zadnji tradi<small>${T.length}</small></h3></div><div class="tw" style="max-height:320px;overflow:auto"><table><thead><tr><th>Čas</th><th>Instrument</th><th>Smer</th><th class="n">Vstop</th><th class="n">Izhod</th><th class="n">R</th><th>Razlog</th></tr></thead><tbody>${T.map(t => `<tr><td class="muted">${dt(t.time)}</td><td>${esc(t.instr)} <span class="muted">${esc(t.tf || '')}</span></td><td><span class="b ${t.dir === 1 ? 'g' : 'r'}">${t.dir === 1 ? 'LONG' : 'SHORT'}</span></td><td class="n">${t.entry ?? '—'}</td><td class="n">${t.exit ?? '—'}</td><td class="n ${pn(t.r)}">${t.r == null ? '—' : fR(t.r)}</td><td class="w muted">${esc(t.why)}</td></tr>`).join('') || '<tr><td colspan="7"><div class="empty">Ni tradov</div></td></tr>'}</tbody></table></div></div>
     ${(a.log || []).length ? `<div class="card" style="margin:0"><div class="ch"><h3>Dnevnik</h3></div>${a.log.slice().reverse().map(l => `<div class="fi"><time>${dt(l.t)}</time><span class="t" style="white-space:normal">${esc(l.txt)}</span></div>`).join('')}</div>` : ''}
     <div class="acts"><button class="btn pri" id="mx">Zapri</button></div>`;
