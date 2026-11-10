@@ -187,6 +187,11 @@ td, th { white-space:normal !important; overflow-wrap:anywhere; } .tw { overflow
 <div id="toast" class="hidden"></div>
 
 <script>
+// diagnostika: vsaka napaka v skripti se pokaže na zaslonu (prej je bila tiha)
+window.addEventListener('error', e => { try { const m = 'Napaka: ' + (e.message || e.error) + (e.lineno ? ' (vrstica ' + e.lineno + ')' : ''); const x = document.getElementById('l-err'); if (x) x.textContent = m; console.error(m); } catch {} });
+window.addEventListener('unhandledrejection', e => { try { const x = document.getElementById('l-err'); if (x) x.textContent = 'Napaka: ' + ((e.reason && e.reason.message) || e.reason); } catch {} });
+</script>
+<script>
 (() => {
 const $ = id => document.getElementById(id), esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const LS = { get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
@@ -207,7 +212,7 @@ $('theme').onclick = () => { LS.set('toWebDark', !document.documentElement.class
 const U = p => CFG.url.replace(/\/+$/, '') + p;
 async function auth(body, grant) { const r = await fetch(U('/auth/v1/token?grant_type=' + grant), { method: 'POST', headers: { apikey: CFG.anon, 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({})); if (!r.ok || !j.access_token) throw new Error(trErr(j.error_description || j.msg || 'Napačna e-pošta ali geslo')); SES = { tok: j.access_token, ref: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000 - 60e3, email: j.user && j.user.email }; LS.set('toWebSes', SES); }
 async function tok() { if (SES && Date.now() < SES.exp) return SES.tok; if (!SES || !SES.ref) throw new Error('prijava'); await auth({ refresh_token: SES.ref }, 'refresh_token'); return SES.tok; }
-async function api(path, opt = {}) { const t = await tok(); const r = await fetch(U('/rest/v1/' + path), { ...opt, headers: { apikey: CFG.anon, Authorization: 'Bearer ' + t, 'Content-Type': 'application/json', ...(opt.headers || {}) } }); if (r.status === 401) { SES = null; LS.set('toWebSes', null); showLogin(); throw new Error('seja potekla'); } if (!r.ok) throw new Error((await r.text()).slice(0, 160)); const x = await r.text(); return x ? JSON.parse(x) : null; }
+async function api(path, opt = {}) { const t = await tok(); const r = await fetch(U('/rest/v1/' + path), { ...opt, headers: { apikey: CFG.anon, Authorization: 'Bearer ' + t, 'Content-Type': 'application/json', ...(opt.headers || {}) } }); if (r.status === 401) { SES = null; LS.set('toWebSes', null); showLogin(); $('l-err').textContent = 'Strežnik je zavrnil sejo (401) pri ' + path.split('?')[0] + ' — ' + (await r.clone().text().catch(() => '')).slice(0, 120); throw new Error('seja potekla'); } if (!r.ok) throw new Error((await r.text()).slice(0, 160)); const x = await r.text(); return x ? JSON.parse(x) : null; }
 async function cmdSend(c, label) { await api('to_cmd', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ cmd: c }) }); toast(`${label} — poslano računalniku (izvede v ~15 s)`); setTimeout(load, 18000); }
 async function cmdUnused(c, label) { await api('to_cmd', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ cmd: c }) }); toast(`${label} — poslano računalniku (izvede v nekaj sekundah)`); setTimeout(load, 7000); }
 
@@ -228,7 +233,7 @@ $('lf').onsubmit = async e => { e.preventDefault(); $('l-err').textContent = '';
     if (mode === 'login') { await auth({ email, password: $('l-pass').value }, 'password'); enter(); }
     else if (mode === 'signup') { if ($('l-pass').value.length < 6) throw new Error('Geslo naj ima vsaj 6 znakov'); if ($('l-pass').value !== $('l-pass2').value) throw new Error('Gesli se ne ujemata'); const j = await pub('/auth/v1/signup', { email, password: $('l-pass').value }); if (j.access_token) { SES = { tok: j.access_token, ref: j.refresh_token, exp: Date.now() + 3500e3, email }; LS.set('toWebSes', SES); return enter(); } if (j.identities && !j.identities.length) throw new Error('Ta e-pošta že ima račun — prijavi se'); setMode('code'); }
     else { const code = $('l-code').value.replace(/\s/g, ''); const j = await pub('/auth/v1/verify', { type: 'signup', email, token: code }); if (!j.access_token) throw new Error('Koda ni pravilna'); SES = { tok: j.access_token, ref: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000 - 60e3, email }; LS.set('toWebSes', SES); toast('Račun ustvarjen'); enter(); }
-  } catch (er) { $('l-err').textContent = trErr(er.message); } finally { $('l-btn').disabled = false; } };
+  } catch (er) { showLogin(); $('l-err').textContent = trErr(er.message) + (er.stack && !/Napačna|Geslo|Koda|E-pošta/.test(trErr(er.message)) ? ' [' + String(er.stack).split('\n')[1] + ']' : ''); } finally { $('l-btn').disabled = false; } };
 setMode('login');
 $('av').onclick = () => { if (confirm('Odjava?')) { SES = null; LS.set('toWebSes', null); showLogin(); } };
 function enter() { $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('av').textContent = ((SES && SES.email) || 'U')[0].toUpperCase(); render(); load(); }
