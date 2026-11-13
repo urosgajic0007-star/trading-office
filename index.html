@@ -169,6 +169,7 @@ td, th { white-space:normal !important; overflow-wrap:anywhere; } .tw { overflow
       <div id="l-codew" class="hidden"><label>Koda iz e-pošte<input id="l-code" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" style="font:600 20px var(--mono);letter-spacing:.3em;text-align:center"></label></div>
       <button class="bp" id="l-btn">Prijava</button><div class="err" id="l-err"></div>
       <div style="margin-top:14px;font-size:13px;color:var(--muted);text-align:center" id="l-sw"></div><div style="margin-top:8px;font-size:13px;text-align:center"><a href="#" id="l-forgot" style="color:var(--muted)">Pozabljeno geslo?</a></div>
+      <div id="l-dl" style="margin-top:18px"></div>
       <div class="note">Spletna stran je samo za spremljanje — nastavitve in upravljanje so v aplikaciji na računalniku. Gesla za brokerja nikoli ne zapustijo računalnika. <a href="#" id="l-reset" style="color:inherit">Spremeni povezavo</a></div></form>
   </div>
 </div>
@@ -217,7 +218,7 @@ async function cmdSend(c, label) { await api('to_cmd', { method: 'POST', headers
 async function cmdUnused(c, label) { await api('to_cmd', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ cmd: c }) }); toast(`${label} — poslano računalniku (izvede v nekaj sekundah)`); setTimeout(load, 7000); }
 
 // ---------- prijava ----------
-function showLogin() { $('app').classList.add('hidden'); $('login').classList.remove('hidden'); $('cfgf').classList.toggle('hidden', !!CFG); $('lf').classList.toggle('hidden', !CFG); }
+function showLogin() { try { const x = $('l-dl'); if (x) { const D = DL(); x.innerHTML = D.repo ? `<div style="font-size:13px;color:var(--muted);margin-bottom:8px;text-align:center">Aplikacija za računalnik${D.v ? ' · verzija ' + esc(D.v) : ''}</div>` + dlButtons(true) : ''; } } catch {} $('app').classList.add('hidden'); $('login').classList.remove('hidden'); $('cfgf').classList.toggle('hidden', !!CFG); $('lf').classList.toggle('hidden', !CFG); }
 $('cfgf').onsubmit = e => { e.preventDefault(); const url = $('c-url').value.trim(), anon = $('c-anon').value.trim(); if (!/^https?:\/\//.test(url)) return $('c-err').textContent = 'URL se mora začeti s https://'; CFG = { url, anon }; LS.set('toWebCfg', CFG); showLogin(); };
 $('l-reset').onclick = e => { e.preventDefault(); LS.set('toWebCfg', null); CFG = window.TO_CONFIG && window.TO_CONFIG.url ? null : null; showLogin(); };
 let mode = 'login'; // login | signup | code
@@ -232,7 +233,7 @@ $('lf').onsubmit = async e => { e.preventDefault(); $('l-err').textContent = '';
   try {
     if (mode === 'login') { await auth({ email, password: $('l-pass').value }, 'password'); enter(); }
     else if (mode === 'signup') { if ($('l-pass').value.length < 6) throw new Error('Geslo naj ima vsaj 6 znakov'); if ($('l-pass').value !== $('l-pass2').value) throw new Error('Gesli se ne ujemata'); const j = await pub('/auth/v1/signup', { email, password: $('l-pass').value }); if (j.access_token) { SES = { tok: j.access_token, ref: j.refresh_token, exp: Date.now() + 3500e3, email }; LS.set('toWebSes', SES); return enter(); } if (j.identities && !j.identities.length) throw new Error('Ta e-pošta že ima račun — prijavi se'); setMode('code'); }
-    else { const code = $('l-code').value.replace(/\s/g, ''); const j = await pub('/auth/v1/verify', { type: 'signup', email, token: code }); if (!j.access_token) throw new Error('Koda ni pravilna'); SES = { tok: j.access_token, ref: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000 - 60e3, email }; LS.set('toWebSes', SES); toast('Račun ustvarjen'); enter(); }
+    else { const code = $('l-code').value.replace(/\s/g, ''); const j = await pub('/auth/v1/verify', { type: 'signup', email, token: code }); if (!j.access_token) throw new Error('Koda ni pravilna'); SES = { tok: j.access_token, ref: j.refresh_token, exp: Date.now() + (j.expires_in || 3600) * 1000 - 60e3, email }; LS.set('toWebSes', SES); toast('Račun ustvarjen — prenesi še aplikacijo za računalnik'); page = 'dl'; enter(); }
   } catch (er) { showLogin(); $('l-err').textContent = trErr(er.message) + (er.stack && !/Napačna|Geslo|Koda|E-pošta/.test(trErr(er.message)) ? ' [' + String(er.stack).split('\n')[1] + ']' : ''); } finally { $('l-btn').disabled = false; } };
 setMode('login');
 $('av').onclick = () => { if (confirm('Odjava?')) { SES = null; LS.set('toWebSes', null); showLogin(); } };
@@ -278,7 +279,7 @@ function dash(el, stale) {
   const list = A.slice().sort((x, y) => (statusRank[x.st.k] - statusRank[y.st.k]) || (y.r - x.r));
   const feed = [...LIVE.ultron.map(x => ({ t: x.t, w: 'Ultron', x: x.txt })), ...LIVE.lab.map(x => ({ t: x.t, w: 'Laboratorij', x: x.txt })), ...A.flatMap(a => (a.log || []).map(l => ({ t: l.t, w: a.name, x: l.txt })))].sort((a, b) => b.t - a.t).slice(0, 14);
   const ou = LIVE.tradeOpenUntil || 0, on = ou > Date.now(), W = LIVE.liveWin, hm = h => String(Math.floor(h)).padStart(2, '0') + ':' + String(Math.round(h % 1 * 60)).padStart(2, '0');
-  const gate = `<div class="card" style="margin:0 0 14px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between"><div><b>${on ? '🟢 Vstop omogočen do ' + new Date(ou).toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' }) : 'Termin trgovanja ' + (W ? hm(W.from) + '–' + hm(W.to) : '15:30–17:00')}</b><div class="muted" style="font-size:12px">${on ? 'Agenti lahko vstopijo ne glede na uro — smer trga mora še vedno ustrezati' : 'Zunaj termina lahko agentom za 15 min dovoliš vstop (smer trga ostane obvezna)'}</div></div>
+  const gate = dlBanner() + `<div class="card" style="margin:0 0 14px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between"><div><b>${on ? '🟢 Vstop omogočen do ' + new Date(ou).toLocaleTimeString('sl-SI', { hour: '2-digit', minute: '2-digit' }) : 'Termin trgovanja ' + (W ? hm(W.from) + '–' + hm(W.to) : '15:30–17:00')}</b><div class="muted" style="font-size:12px">${on ? 'Agenti lahko vstopijo ne glede na uro — smer trga mora še vedno ustrezati' : 'Zunaj termina lahko agentom za 15 min dovoliš vstop (smer trga ostane obvezna)'}</div></div>
     <button class="btn ${on ? '' : 'pri'}" id="gate-btn">${on ? 'Prekliči' : 'Omogoči vstop 15 min'}</button>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%;border-top:1px solid var(--line);padding-top:10px"><span class="muted" style="font-size:12px">Termin:</span><input type="time" id="gw-f" value="${W ? hm(W.from) : '15:30'}" style="width:auto"><span>–</span><input type="time" id="gw-t" value="${W ? hm(W.to) : '17:00'}" style="width:auto"><button class="btn" id="gw-s">Shrani termin</button></div></div>`;
   el.innerHTML = head('Pregled', new Date().toLocaleDateString('sl-SI', { weekday: 'long', day: 'numeric', month: 'long' })) + stale + gate +
@@ -352,6 +353,15 @@ function kos(el, stale) {
 }
 const isIOS = () => /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+// 1.18.5: prenos aplikacije — na prijavi, po registraciji in kot opozorilo, ko je na voljo posodobitev
+const DL = () => { const C = window.TO_CONFIG || {}; return { repo: C.repo, v: C.version || '', base: C.repo ? `https://github.com/${C.repo}/releases/latest/download/` : '' }; };
+const vNum = v => String(v || '').split('.').map(x => +x || 0).reduce((a, x) => a * 1000 + x, 0);
+function dlButtons(small) { const D = DL(); if (!D.repo) return ''; const b = (t, f, pri) => `<a class="btn ${pri ? 'pri' : ''}" href="${D.base + f}" style="${small ? 'flex:1;justify-content:center' : ''}">${ic('down')}${t}</a>`;
+  return `<div style="display:flex;gap:8px;flex-wrap:wrap">${b('Trading Office Pro (Windows)', 'Trading-Office-Pro-Setup.exe', true)}${b('Klasična', 'Trading-Office-Setup.exe')}</div>`; }
+function dlBanner() { const D = DL(); if (!D.repo || !D.v) return ''; const pc = LIVE && LIVE.ver;
+  if (!pc) return `<div class="card" style="margin:0 0 14px;padding:12px 14px"><b>Prenesi aplikacijo za računalnik</b><div class="muted" style="font-size:12px;margin:4px 0 10px">Agenti trgujejo v aplikaciji na tvojem računalniku (Windows) — spletna stran samo prikazuje. Verzija ${esc(D.v)}.</div>${dlButtons(true)}</div>`;
+  if (vNum(D.v) > vNum(pc)) return `<div class="card" style="margin:0 0 14px;padding:12px 14px;border-color:var(--accent)"><b>Na voljo je posodobitev ${esc(D.v)}</b> <span class="muted">(na računalniku imaš ${esc(pc)})</span><div class="muted" style="font-size:12px;margin:4px 0 10px">Aplikacija se posodobi sama ob ponovnem zagonu. Če se ne, prenesi in zaženi installer — podatki in agenti ostanejo.</div>${dlButtons(true)}</div>`;
+  return ''; }
 function dlP(el) {
   const C = window.TO_CONFIG || {}, repo = C.repo, v = C.version || '', base = repo ? `https://github.com/${repo}/releases/latest/download/` : '';
   const item = (t, d, f) => `<div class="ai" style="border-right:0;cursor:default"><div class="nm"><b>${t}</b><small>${d}</small></div>${repo ? `<a class="btn pri" href="${base + f}">${ic('down')}Prenesi</a>` : '<span class="muted">povezava še ni nastavljena</span>'}</div>`;
@@ -394,7 +404,7 @@ function setP(el) {
 
 // pozabljeno geslo: pošlje povezavo na e-pošto; povezava odpre to stran (type=recovery) in vpraša za novo geslo
 $('l-forgot').onclick = async e => { e.preventDefault(); const email = $('l-email').value.trim(); if (!email) { $('l-err').textContent = 'Najprej vpiši svojo e-pošto zgoraj'; return; }
-  try { const r = await fetch(U('/auth/v1/recover'), { method: 'POST', headers: { apikey: CFG.anon, 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) }); if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.msg || j.error_description || 'HTTP ' + r.status); }
+  try { const r = await fetch(U('/auth/v1/recover?redirect_to=' + encodeURIComponent(location.origin + location.pathname)), { method: 'POST', headers: { apikey: CFG.anon, 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) }); if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.msg || j.error_description || 'HTTP ' + r.status); }
     $('l-err').textContent = '✓ Povezava za novo geslo je poslana na ' + email + ' — odpri jo na tem telefonu (preveri tudi Promocije/Spam).'; } catch (er) { $('l-err').textContent = 'Pošiljanje ni uspelo: ' + er.message; } };
 async function setNewPass() { for (let i = 0; i < 3; i++) { const p1 = prompt('Vpiši novo geslo (vsaj 6 znakov):'); if (p1 == null) return; if (p1.length < 6) { alert('Geslo naj ima vsaj 6 znakov'); continue; }
     try { const r = await fetch(U('/auth/v1/user'), { method: 'PUT', headers: { apikey: CFG.anon, Authorization: 'Bearer ' + SES.tok, 'Content-Type': 'application/json' }, body: JSON.stringify({ password: p1 }) }); if (!r.ok) { const j = await r.json().catch(() => ({})); throw new Error(j.msg || j.error_description || 'HTTP ' + r.status); } toast('Geslo je spremenjeno — zdaj si prijavljen'); return; } catch (er) { alert('Geslo ni bilo spremenjeno: ' + er.message); } } }
